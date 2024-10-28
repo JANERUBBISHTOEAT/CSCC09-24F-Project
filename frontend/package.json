@@ -1,0 +1,19 @@
+{
+  "name": "cscc09-24f-project",
+  "version": "1.0.0",
+  "description": "$\\quad$ Abstract $-$ TODO",
+  "main": "app.mjs",
+  "scripts": {
+    "prod": "node app.mjs",
+    "dev": "nodemon app.mjs",
+    "test": "npx mocha"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "drag-drop": "^7.2.0",
+    "express": "^4.21.1",
+    "nodemon": "^3.1.7",
+    "webtorrent": "^2.5.1"
+  }
+}
