@@ -57,9 +57,11 @@ Potential challenges may arise in developing [Name_of_Project], some of which ma
 
 2. **WebTorrent Limitations**: As shown in the picture, WebTorrent clients are not fully connected to the desktop BitTorrent clients, rather going through a kind of "adapter". This may limit the number of users who can access the application.
 
-![Nwtwork](https://camo.githubusercontent.com/ad3fe62845574fe458a186fe76055198fc2d896fc5f50241c7993403e21f9a86/68747470733a2f2f776562746f7272656e742e696f2f696d672f6e6574776f726b2e706e67)
+   ![Nwtwork](https://camo.githubusercontent.com/ad3fe62845574fe458a186fe76055198fc2d896fc5f50241c7993403e21f9a86/68747470733a2f2f776562746f7272656e742e696f2f696d672f6e6574776f726b2e706e67)
 
-4. **WebRTC Limitations**: WebRTC is not supported by all browsers, which may limit the number of users who can access the application. An incomplete list of known supported browsers can be found on [Wikipedia](https://caniuse.com/mdn-api_webrtc).
+    Additionally, controversial issues is discussed in [Library Comparison](#library-comparison) section.
+
+3. **WebRTC Limitations**: WebRTC is not supported by all browsers, which may limit the number of users who can access the application. An incomplete list of known supported browsers can be found on [Wikipedia](https://caniuse.com/mdn-api_webrtc).
     Most major desktop browsers are supported:
    - Microsoft Edge 12+
    - Google Chrome 28+
@@ -69,17 +71,17 @@ Potential challenges may arise in developing [Name_of_Project], some of which ma
    - Vivaldi 1.9+
    - Brave
 
-5. **File Chunking**: Splitting large files into smaller chunks and reassembling them on the recipient's end may be challenging.
+4. **File Chunking**: Splitting large files into smaller chunks and reassembling them on the recipient's end may be challenging.
    - WebTorrent may lack native chunking support, necessitating custom implementation.
    - Ensuring file integrity during chunking and reassembly is crucial.
    - Streaming files before fully uploaded may require additional work.
 
-6. **Advanced Seeding**: Distributing file chunks to multiple users needs to confirm feasibility. This may not be possible with Torrent protocol.
+5. **Advanced Seeding**: Distributing file chunks to multiple users needs to confirm feasibility. This may not be possible with Torrent protocol.
    - The feasibility of establishing multiple P2P links to expedite download speed is uncertain.
    - Ensuring file availability after the sender closes the browser requires active seeding by volunteer users or a server.
    - Distributing chunks to users who did not request them may not align current WebTorrent protocol.
 
-7. **Security**: Implementing encryption and decryption for file sharing is crucial for user privacy and data security.
+6. **Security**: Implementing encryption and decryption for file sharing is crucial for user privacy and data security.
     - Ensure that the key exchange is secure.
     - Integrating OAuth, MFA, and local authentication may require additional work.
 
@@ -97,9 +99,13 @@ Potential challenges may arise in developing [Name_of_Project], some of which ma
 
 ### Libraries
 
-We independently developed the frontend using `Remix` and implemented functionality with the `webtorrent` npm package. `webtorrent` relies on WebRTC, limiting browser compatibility and requiring users to keep their browser open to seed files.
+We independently developed the frontend using `Remix` and implemented functionality with the `webtorrent` npm package.
 
-A potential solution is using an existing advanced seeding methods that distribute file chunks across multiple users, allowing the sender to close their browser while keeping the file available for download. Despite [wormhole-crypto](https://github.com/SocketDev/wormhole-crypto) being be an option to serve this purpose, it appears inactive.
+#### Library Comparison
+
+`webtorrent` utilizes one of the traditional P2P file-sharing protocols, BitTorrent, as a foundation. While BitTorrent supports large-scale public file-sharing in extensive user networks, it may not be ideal for our application, which requires secure, private and small-scale file sharing.
+
+A more specialized and suitable P2P method could support small group sharing, allowing senders to disconnect while files remain accessible. Though [wormhole-crypto](https://github.com/SocketDev/wormhole-crypto) could serve this need, it appears inactive for over a year, raising concerns about its reliability.
 
 ## Optimization
 
