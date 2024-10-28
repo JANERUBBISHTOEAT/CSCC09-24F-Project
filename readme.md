@@ -10,9 +10,9 @@ $\quad$ This paper presents a browser-based BitTorrent client with encrypted fil
 
 ## Introduction
 
-[Name_of_Project] will be a web application designed for secure, fast file sharing through a peer-to-peer (P2P) system. Unlike traditional methods requiring files to upload to a server before download, which can be slow and less secure, this app allows direct user-to-user file transfer, significantly enhancing speed. Additionally, encryption ensures high security for all shared files on the P2P network.
+[Name_of_Project](#introduction) will be a web application designed for secure, fast file sharing through a peer-to-peer (P2P) system. Unlike traditional methods requiring files to upload to a server before download, which can be slow and less secure, this app allows direct user-to-user file transfer, significantly enhancing speed. Additionally, encryption ensures high security for all shared files on the P2P network.
 
-A demonstration was already found at [webtorrent.io](https://webtorrent.io/) illustrates certain limitations in the current implementation: files are shared directly between users without encryption, posing security risks; file size is constrained by browser memory; and files are lost if the sender closes the browser. [Name_of_Project] seeks to resolve these issues by developing a more advanced, secure, and user-friendly P2P file-sharing application.
+A demonstration was already found at [webtorrent.io](https://webtorrent.io/) illustrates certain limitations in the current implementation: files are shared directly between users without encryption, posing security risks; file size is constrained by browser memory; and files are lost if the sender closes the browser. [Name_of_Project](#introduction) seeks to resolve these issues by developing a more advanced, secure, and user-friendly P2P file-sharing application.
 
 ## Features
 
@@ -50,7 +50,7 @@ The final version of the application will incorporate the following additional f
 - Time-based one-time password (TOTP) for key exchange.*
 
 > Features marked with an asterisk (*) require proof of concept to verify feasibility and may be subject to change.
-> Within the scope of the course, [Name_of_Project] will prioritize core features, with additional implementations as time allows.
+> Within the scope of the course, [Name_of_Project](#introduction) will prioritize core features, with additional implementations as time allows.
 
 ## Design / Technology Stack
 
@@ -75,13 +75,13 @@ We independently developed the frontend using `Remix` and implemented functional
 
 #### Library Comparison
 
-`webtorrent` utilizes one of the traditional P2P file-sharing protocols, BitTorrent, as a foundation. While BitTorrent supports large-scale public file-sharing in extensive user networks, it may not be ideal for our application, which requires secure, private and small-scale file sharing.
+`webtorrent` utilizes one of the traditional P2P file-sharing protocols, BitTorrent, as a foundation. While BitTorrent is more trust-worthy and supports large-scale public file-sharing in extensive user networks, it may not be ideal for our application, which requires secure, private and small-scale file sharing.
 
 A more specialized and suitable P2P method could support small group sharing, allowing senders to disconnect while files remain accessible. Though [wormhole-crypto](https://github.com/SocketDev/wormhole-crypto) could serve this need, it appears inactive for over a year, raising concerns about its reliability.
 
 ## Anticipated Challenges
 
-Potential challenges may arise in developing [Name_of_Project], some of which may eventually be deemed unfeasible within the course scope and subject to adjustment.
+Potential challenges may arise in developing [Name_of_Project](#introduction), some of which may eventually be deemed unfeasible within the course scope and subject to adjustment.
 
 1. **Objective Challenge**: This project aims to develop a secure, efficient, and user-friendly P2P file-sharing application as a faster and safer alternative to existing cloud services like Google Drive, Dropbox, and OneDrive, addressing potential concerns about the need for such a solution in a market dominated by traditional options.
 
@@ -89,7 +89,7 @@ Potential challenges may arise in developing [Name_of_Project], some of which ma
 
    ![Nwtwork](https://camo.githubusercontent.com/ad3fe62845574fe458a186fe76055198fc2d896fc5f50241c7993403e21f9a86/68747470733a2f2f776562746f7272656e742e696f2f696d672f6e6574776f726b2e706e67)
 
-    Additionally, controversial issues is discussed in [Library Comparison](#library-comparison) section.
+    Additionally, a controversial issue was discussed in [Library Comparison](#library-comparison) section.
 
 3. **WebRTC Limitations**: WebRTC is not supported by all browsers, which may limit the number of users who can access the application. An incomplete list of known supported browsers can be found on [Wikipedia](https://caniuse.com/mdn-api_webrtc).
     Most major desktop browsers are supported:
