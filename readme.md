@@ -1,6 +1,6 @@
-# CSCC09 24F Final Project: TODO: Title
+# CSCC09 24F Final Project: A Secure Web Implementation for P2P File Sharing
 
-$\quad$ Abstract $-$ TODO
+$\quad$ This paper presents a browser-based BitTorrent client with encrypted file-sharing functionality. The client will leverage [Remix](https://remix.run/) and [WebTorrent](https://github.com/webtorrent/webtorrent) for the frontend, with backend deployment on Google Cloud Platform. Project evaluation will focus on performance, security, and user experience.
 
 ## Group Members
 
@@ -10,39 +10,100 @@ $\quad$ Abstract $-$ TODO
 
 ## Introduction
 
-TODO: a description of the web application
+[Name_of_Project] will be a web application designed for secure, fast file sharing through a peer-to-peer (P2P) system. Unlike traditional methods requiring files to upload to a server before download, which can be slow and less secure, this app allows direct user-to-user file transfer, significantly enhancing speed. Additionally, encryption ensures high security for all shared files on the P2P network.
 
-Find demo at: [webtorrent.io](https://webtorrent.io/).
-or: [wormhole](https://wormhole.app/)
-We are to make a web application that allows users to share files with each other, but with better performance, security and user experience features compared to the demo.
+A demonstration was already found at [webtorrent.io](https://webtorrent.io/) illustrates certain limitations in the current implementation: files are shared directly between users without encryption, posing security risks; file size is constrained by browser memory; and files are lost if the sender closes the browser. [Name_of_Project] seeks to resolve these issues by developing a more advanced, secure, and user-friendly P2P file-sharing application.
 
 ## Features
 
-### Core Features
+### Core Features / Beta Version
 
-TODO: a description of the key features that will be completed by the Beta version
+The beta version of application will incorporate following features (in order of priority):
 
-### Additional Features
+#### File Transfer
 
-TODO: a description of the additional features that will be complete by the Final version
+- An improved WebUI for file upload and download, allowing users to upload files and receive a unique access link.
+- Users can upload files and receive a unique link for access.
+- Users may download files by entering the unique link.
+- File integrity is ensured by performing a hash check before and after transfer.
+
+### Additional Features / Final Version
+
+The final version of the application will incorporate the following additional features:
+
+#### File Transfer
+
+- Large files are split into chunks to accommodate browser memory constraints.
+- Reassembling file chunks seamlessly on the recipient's end.
+- Receivers can download the file before fully uploaded: streaming / chunking.
+- Establish multiple P2P links to expedite download speed.*
+- Distributing chunks to multiple users to enhance download speed.*
+- Senders may close the browser and the file will still be available to download: advanced seeding.*
+
+#### Security
+
+- Files are encrypted by senders prior to upload, generating a unique decryption key.
+- Receivers use this key to decrypt the file upon download.
+- OAuth, MFA, local authentication are integrated on demand for enhanced security measures.
+
+> Features marked with an asterisk (*) require proof of concept to verify feasibility and may be subject to change.
+> Within the scope of the course, [Name_of_Project] will prioritize core features, with additional implementations as time allows.
 
 ## Anticipated Challenges
 
-TODO: a description of the top 5 technical challenges. Understand that a challenge is something new that you have to learn or figure out. Anything we have already covered in class cannot be considered as a challenge. Making the application work and deploying it is not a challenge but a project requirement.
+Potential challenges may arise in developing [Name_of_Project], some of which may eventually be deemed unfeasible within the course scope and subject to adjustment.
 
-## Design
+1. **Objective Challenge**: This project aims to develop a secure, efficient, and user-friendly P2P file-sharing application as a faster and safer alternative to existing cloud services like Google Drive, Dropbox, and OneDrive, addressing potential concerns about the need for such a solution in a market dominated by traditional options.
 
-TODO: a description of the technology stack that you will use to build and deploy it
+2. **WebTorrent Limitations**: As shown in the picture, WebTorrent clients are not fully connected to the desktop BitTorrent clients, rather going through a kind of "adapter". This may limit the number of users who can access the application.
 
-We developed frontend on our own using React.js.
+![Nwtwork](https://camo.githubusercontent.com/ad3fe62845574fe458a186fe76055198fc2d896fc5f50241c7993403e21f9a86/68747470733a2f2f776562746f7272656e742e696f2f696d672f6e6574776f726b2e706e67)
 
-We utilize npm package [`webtorrent`](https://github.com/webtorrent/webtorrent) to do the functionalities job as they are not part of the marking scheme, but main constraint is that it relies on WebRTC which is not supported by all browsers, also relies on user to keep the browser open to seed a rare file.
+4. **WebRTC Limitations**: WebRTC is not supported by all browsers, which may limit the number of users who can access the application. An incomplete list of known supported browsers can be found on [Wikipedia](https://caniuse.com/mdn-api_webrtc).
+    Most major desktop browsers are supported:
+   - Microsoft Edge 12+
+   - Google Chrome 28+
+   - Mozilla Firefox 22+
+   - Safari 11+
+   - Opera 18+
+   - Vivaldi 1.9+
+   - Brave
 
-One approach to tackle this is to use a smarter seeding technology, that is to distribute file chunks to multiple users even if they didn't request it, and now the sender can close the browser and the file will still be available to download. [wormhole-crypto](https://github.com/SocketDev/wormhole-crypto) is one option but looks dead.
+5. **File Chunking**: Splitting large files into smaller chunks and reassembling them on the recipient's end may be challenging.
+   - WebTorrent may lack native chunking support, necessitating custom implementation.
+   - Ensuring file integrity during chunking and reassembly is crucial.
+   - Streaming files before fully uploaded may require additional work.
+
+6. **Advanced Seeding**: Distributing file chunks to multiple users needs to confirm feasibility. This may not be possible with Torrent protocol.
+   - The feasibility of establishing multiple P2P links to expedite download speed is uncertain.
+   - Ensuring file availability after the sender closes the browser requires active seeding by volunteer users or a server.
+   - Distributing chunks to users who did not request them may not align current WebTorrent protocol.
+
+7. **Security**: Implementing encryption and decryption for file sharing is crucial for user privacy and data security.
+    - Ensure that the key exchange is secure.
+    - Integrating OAuth, MFA, and local authentication may require additional work.
+
+## Design / Technology Stack
+
+### Frontend
+
+- `Remix` will be used for the frontend.
+- `webtorrent` will be used for the P2P file-sharing functionality.
+- Google Cloud Platform will be used for deployment.
+
+### Backend
+
+- Google Cloud Platform will be used for backend deployment.
+
+### Libraries
+
+We independently developed the frontend using `Remix` and implemented functionality with the `webtorrent` npm package. `webtorrent` relies on WebRTC, limiting browser compatibility and requiring users to keep their browser open to seed files.
+
+A potential solution is using an existing advanced seeding methods that distribute file chunks across multiple users, allowing the sender to close their browser while keeping the file available for download. Despite [wormhole-crypto](https://github.com/SocketDev/wormhole-crypto) being be an option to serve this purpose, it appears inactive.
 
 ## Optimization
 
-TODO: later
+TODO: move Additional Features to Optimization after implementation
 
 ## Benchmarking
 
@@ -57,7 +118,7 @@ TODO: later
 
 ## Conclusion
 
-In this project, TODO
+TODO: later
 
 ## References
 
