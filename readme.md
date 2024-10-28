@@ -26,6 +26,7 @@ The beta version of application will incorporate following features (in order of
 - Users can upload files and receive a unique link for access.
 - Users may download files by entering the unique link.
 - File integrity is ensured by performing a hash check before and after transfer.
+- Face-to-face file sharing by scanning QR codes or other methods.
 
 ### Additional Features / Final Version
 
@@ -44,10 +45,39 @@ The final version of the application will incorporate the following additional f
 
 - Files are encrypted by senders prior to upload, generating a unique decryption key.
 - Receivers use this key to decrypt the file upon download.
+- Embed keys directly within `magnet` links and `.Torrent` files for secure sharing.
 - OAuth, MFA, local authentication are integrated on demand for enhanced security measures.
+- Time-based one-time password (TOTP) for key exchange.*
 
 > Features marked with an asterisk (*) require proof of concept to verify feasibility and may be subject to change.
 > Within the scope of the course, [Name_of_Project] will prioritize core features, with additional implementations as time allows.
+
+## Design / Technology Stack
+
+### Design Overview
+
+![System_Design](./System_Design.svg)
+>
+
+### Frontend
+
+- `Remix` will be used for the frontend.
+- `webtorrent` will be used for the P2P file-sharing functionality.
+- Google Cloud Platform will be used for deployment.
+
+### Backend
+
+- Google Cloud Platform will be used for backend deployment.
+
+### Libraries
+
+We independently developed the frontend using `Remix` and implemented functionality with the `webtorrent` npm package.
+
+#### Library Comparison
+
+`webtorrent` utilizes one of the traditional P2P file-sharing protocols, BitTorrent, as a foundation. While BitTorrent supports large-scale public file-sharing in extensive user networks, it may not be ideal for our application, which requires secure, private and small-scale file sharing.
+
+A more specialized and suitable P2P method could support small group sharing, allowing senders to disconnect while files remain accessible. Though [wormhole-crypto](https://github.com/SocketDev/wormhole-crypto) could serve this need, it appears inactive for over a year, raising concerns about its reliability.
 
 ## Anticipated Challenges
 
@@ -84,28 +114,6 @@ Potential challenges may arise in developing [Name_of_Project], some of which ma
 6. **Security**: Implementing encryption and decryption for file sharing is crucial for user privacy and data security.
     - Ensure that the key exchange is secure.
     - Integrating OAuth, MFA, and local authentication may require additional work.
-
-## Design / Technology Stack
-
-### Frontend
-
-- `Remix` will be used for the frontend.
-- `webtorrent` will be used for the P2P file-sharing functionality.
-- Google Cloud Platform will be used for deployment.
-
-### Backend
-
-- Google Cloud Platform will be used for backend deployment.
-
-### Libraries
-
-We independently developed the frontend using `Remix` and implemented functionality with the `webtorrent` npm package.
-
-#### Library Comparison
-
-`webtorrent` utilizes one of the traditional P2P file-sharing protocols, BitTorrent, as a foundation. While BitTorrent supports large-scale public file-sharing in extensive user networks, it may not be ideal for our application, which requires secure, private and small-scale file sharing.
-
-A more specialized and suitable P2P method could support small group sharing, allowing senders to disconnect while files remain accessible. Though [wormhole-crypto](https://github.com/SocketDev/wormhole-crypto) could serve this need, it appears inactive for over a year, raising concerns about its reliability.
 
 ## Optimization
 

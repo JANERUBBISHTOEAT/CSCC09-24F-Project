@@ -130,3 +130,4 @@ dist
 .pnp.*
 
 frontend/static/*.min.js
+*.pdf
