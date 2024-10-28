@@ -1,4 +1,4 @@
-# CSCC09 24F Final Project: A Secure Web Implementation for P2P File Sharing
+# CSCC09 24F Final Project - WebToWeb: A Secure Web Implementation for P2P File Sharing
 
 $\quad$ This paper presents a browser-based BitTorrent client with encrypted file-sharing functionality. The client will leverage [Remix](https://remix.run/) and [WebTorrent](https://github.com/webtorrent/webtorrent) for the frontend, with backend deployment on Google Cloud Platform. Project evaluation will focus on performance, security, and user experience.
 
@@ -10,9 +10,9 @@ $\quad$ This paper presents a browser-based BitTorrent client with encrypted fil
 
 ## Introduction
 
-[Name_of_Project](#introduction) will be a web application designed for secure, fast file sharing through a peer-to-peer (P2P) system. Unlike traditional methods requiring files to upload to a server before download, which can be slow and less secure, this app allows direct user-to-user file transfer, significantly enhancing speed. Additionally, encryption ensures high security for all shared files on the P2P network.
+[WebToWeb](#introduction) will be a web application designed for secure, fast file sharing through a peer-to-peer (P2P) system. Unlike traditional methods requiring files to upload to a server before download, which can be slow and less secure, this app allows direct user-to-user file transfer, significantly enhancing speed. Additionally, encryption ensures high security for all shared files on the P2P network.
 
-A demonstration was already found at [webtorrent.io](https://webtorrent.io/) illustrates certain limitations in the current implementation: files are shared directly between users without encryption, posing security risks; file size is constrained by browser memory; and files are lost if the sender closes the browser. [Name_of_Project](#introduction) seeks to resolve these issues by developing a more advanced, secure, and user-friendly P2P file-sharing application.
+A demonstration was already found at [webtorrent.io](https://webtorrent.io/) illustrates certain limitations in the current implementation: files are shared directly between users without encryption, posing security risks; file size is constrained by browser memory; and files are lost if the sender closes the browser. [WebToWeb](#introduction) seeks to resolve these issues by developing a more advanced, secure, and user-friendly P2P file-sharing application.
 
 ## Features
 
@@ -50,7 +50,7 @@ The final version of the application will incorporate the following additional f
 - Time-based one-time password (TOTP) for key exchange.*
 
 > Features marked with an asterisk (*) require proof of concept to verify feasibility and may be subject to change.
-> Within the scope of the course, [Name_of_Project](#introduction) will prioritize core features, with additional implementations as time allows.
+> Within the scope of the course, [WebToWeb](#introduction) will prioritize core features, with additional implementations as time allows.
 
 ## Design / Technology Stack
 
@@ -81,7 +81,7 @@ A more specialized and suitable P2P method could support small group sharing, al
 
 ## Anticipated Challenges
 
-Potential challenges may arise in developing [Name_of_Project](#introduction), some of which may eventually be deemed unfeasible within the course scope and subject to adjustment.
+Potential challenges may arise in developing [WebToWeb](#introduction), some of which may eventually be deemed unfeasible within the course scope and subject to adjustment.
 
 1. **Objective Challenge**: This project aims to develop a secure, efficient, and user-friendly P2P file-sharing application as a faster and safer alternative to existing cloud services like Google Drive, Dropbox, and OneDrive, addressing potential concerns about the need for such a solution in a market dominated by traditional options.
 
