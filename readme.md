@@ -34,6 +34,7 @@ The final version of the application will incorporate the following additional f
 
 #### File Transfer
 
+- Users account keep records of files uploaded and downloaded.
 - Large files are split into chunks to accommodate browser memory constraints.
 - Reassembling file chunks seamlessly on the recipient's end.
 - Receivers can download the file before fully uploaded: streaming / chunking.
