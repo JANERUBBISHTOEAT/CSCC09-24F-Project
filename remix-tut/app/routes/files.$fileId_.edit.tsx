@@ -102,6 +102,7 @@ export default function EditFile() {
           name="filename"
           placeholder="Filename"
           type="text"
+          disabled
         />
         <input
           aria-label="Token"
@@ -109,6 +110,7 @@ export default function EditFile() {
           name="token"
           placeholder="Token"
           type="text"
+          disabled
         />
       </p>
       <label>
@@ -118,6 +120,7 @@ export default function EditFile() {
           name="notes"
           placeholder="TODO"
           type="text"
+          disabled
         />
       </label>
       <label>
@@ -128,6 +131,7 @@ export default function EditFile() {
           name="avatar"
           placeholder="magnet:?"
           type="text"
+          disabled
         />
       </label>
       <label>

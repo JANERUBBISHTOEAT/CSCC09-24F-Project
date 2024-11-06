@@ -337,6 +337,13 @@ i {
 #contact-form > div:first-of-type input {
   display: none;
 }
+#contact-form input[disabled] {
+  background-color: #f0f0f0;
+  color: #a0a0a0;
+  border: 1px solid #ccc;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
 #contact-form > p:first-of-type {
   margin: 0;
   padding: 0;
