@@ -31,36 +31,36 @@ export default function EditFile() {
       <p>
         <span>Name</span>
         <input
-          aria-label="First name"
+          aria-label="Filename"
           defaultValue={file.filename}
-          name="first"
-          placeholder="First"
+          name="filename"
+          placeholder="Filename"
           type="text"
         />
         <input
-          aria-label="Last name"
+          aria-label="Token"
           defaultValue={file.token}
-          name="last"
-          placeholder="Last"
+          name="token"
+          placeholder="Token"
           type="text"
         />
       </p>
       <label>
-        <span>Twitter</span>
+        <span>Share with</span>
         <input
           defaultValue={file.notes}
-          name="twitter"
-          placeholder="@jack"
+          name="notes"
+          placeholder="TODO"
           type="text"
         />
       </label>
       <label>
-        <span>Avatar URL</span>
+        <span>File Link</span>
         <input
-          aria-label="Avatar URL"
+          aria-label="File Link"
           defaultValue={file.magnet}
           name="avatar"
-          placeholder="https://example.com/avatar.jpg"
+          placeholder="magnet:?"
           type="text"
         />
       </label>

@@ -51,6 +51,7 @@ export default function File() {
 
         {file.notes ? (
           <p>
+            Shared with
             <a href={`https://twitter.com/${file.notes}`}>{file.notes}</a>
           </p>
         ) : null}
