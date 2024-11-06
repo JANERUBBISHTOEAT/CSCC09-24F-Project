@@ -3,11 +3,11 @@ import { json, redirect } from "@remix-run/node";
 import { Form, useLoaderData, useNavigate } from "@remix-run/react";
 import invariant from "tiny-invariant";
 
-import { getContact, updateContact } from "../data";
+import { getFile, updateFile } from "../data";
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   invariant(params.fileId, "Missing fileId param");
-  const contact = await getContact(params.fileId);
+  const contact = await getFile(params.fileId);
   if (!contact) {
     throw new Response("Not Found", { status: 404 });
   }
@@ -18,7 +18,7 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
   invariant(params.fileId, "Missing fileId param");
   const formData = await request.formData();
   const updates = Object.fromEntries(formData);
-  await updateContact(params.fileId, updates);
+  await updateFile(params.fileId, updates);
   return redirect(`/files/${params.fileId}`);
 };
 

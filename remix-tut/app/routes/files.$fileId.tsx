@@ -5,11 +5,11 @@ import { Form, useFetcher, useLoaderData } from "@remix-run/react";
 import type { FunctionComponent } from "react";
 import invariant from "tiny-invariant";
 import type { ContactRecord } from "../data";
-import { getContact, updateContact } from "../data";
+import { getFile, updateFile } from "../data";
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   invariant(params.fileId, "Missing fileId param");
-  const contact = await getContact(params.fileId);
+  const contact = await getFile(params.fileId);
   if (!contact) {
     throw new Response("Not Found", { status: 404 });
   }
@@ -19,7 +19,7 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
 export const action = async ({ params, request }: ActionFunctionArgs) => {
   invariant(params.fileId, "Missing fileId param");
   const formData = await request.formData();
-  return updateContact(params.fileId, {
+  return updateFile(params.fileId, {
     favorite: formData.get("favorite") === "true",
   });
 };

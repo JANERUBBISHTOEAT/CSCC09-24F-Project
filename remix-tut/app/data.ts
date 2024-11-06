@@ -62,7 +62,7 @@ const fakefiles = {
 
 ////////////////////////////////////////////////////////////////////////////////
 // Handful of helper functions to be called from route loaders and actions
-export async function getfiles(query?: string | null) {
+export async function getFiles(query?: string | null) {
   await new Promise((resolve) => setTimeout(resolve, 500));
   let files = await fakefiles.getAll();
   if (query) {
@@ -73,16 +73,16 @@ export async function getfiles(query?: string | null) {
   return files.sort(sortBy("last", "createdAt"));
 }
 
-export async function createEmptyContact() {
+export async function createEmptyFile() {
   const contact = await fakefiles.create({});
   return contact;
 }
 
-export async function getContact(id: string) {
+export async function getFile(id: string) {
   return fakefiles.get(id);
 }
 
-export async function updateContact(id: string, updates: ContactMutation) {
+export async function updateFile(id: string, updates: ContactMutation) {
   const contact = await fakefiles.get(id);
   if (!contact) {
     throw new Error(`No contact found for ${id}`);
@@ -91,7 +91,7 @@ export async function updateContact(id: string, updates: ContactMutation) {
   return contact;
 }
 
-export async function deleteContact(id: string) {
+export async function deleteFile(id: string) {
   fakefiles.destroy(id);
 }
 

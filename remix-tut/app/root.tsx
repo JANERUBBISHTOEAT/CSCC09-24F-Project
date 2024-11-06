@@ -14,7 +14,7 @@ import {
 } from "@remix-run/react";
 import { useEffect } from "react";
 import appStylesHref from "./app.css?url";
-import { createEmptyContact, getfiles } from "./data";
+import { createEmptyFile, getFiles } from "./data";
 
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: appStylesHref },
@@ -23,12 +23,12 @@ export const links: LinksFunction = () => [
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const url = new URL(request.url);
   const q = url.searchParams.get("q");
-  const files = await getfiles(q);
+  const files = await getFiles(q);
   return json({ files, q });
 };
 
 export const action = async () => {
-  const contact = await createEmptyContact();
+  const contact = await createEmptyFile();
   return redirect(`/files/${contact.id}/edit`);
 };
 
