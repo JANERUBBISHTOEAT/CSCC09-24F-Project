@@ -96,9 +96,9 @@ export default function App() {
                       }
                       to={`contacts/${contact.id}`}
                     >
-                      {contact.first || contact.last ? (
+                      {contact.filename || contact.token ? (
                         <>
-                          {contact.first} {contact.last}
+                          {contact.filename} {contact.token}
                         </>
                       ) : (
                         <i>No Name</i>

@@ -31,17 +31,17 @@ export default function Contact() {
     <div id="contact">
       <div>
         <img
-          alt={`${contact.first} ${contact.last} avatar`}
-          key={contact.avatar}
-          src={contact.avatar}
+          alt={`${contact.filename} ${contact.token} avatar`}
+          key={contact.magnet}
+          src={contact.magnet}
         />
       </div>
 
       <div>
         <h1>
-          {contact.first || contact.last ? (
+          {contact.filename || contact.token ? (
             <>
-              {contact.first} {contact.last}
+              {contact.filename} {contact.token}
             </>
           ) : (
             <i>No Name</i>
@@ -49,11 +49,9 @@ export default function Contact() {
           <Favorite contact={contact} />
         </h1>
 
-        {contact.twitter ? (
+        {contact.notes ? (
           <p>
-            <a href={`https://twitter.com/${contact.twitter}`}>
-              {contact.twitter}
-            </a>
+            <a href={`https://twitter.com/${contact.notes}`}>{contact.notes}</a>
           </p>
         ) : null}
 

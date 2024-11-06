@@ -32,14 +32,14 @@ export default function EditContact() {
         <span>Name</span>
         <input
           aria-label="First name"
-          defaultValue={contact.first}
+          defaultValue={contact.filename}
           name="first"
           placeholder="First"
           type="text"
         />
         <input
           aria-label="Last name"
-          defaultValue={contact.last}
+          defaultValue={contact.token}
           name="last"
           placeholder="Last"
           type="text"
@@ -48,7 +48,7 @@ export default function EditContact() {
       <label>
         <span>Twitter</span>
         <input
-          defaultValue={contact.twitter}
+          defaultValue={contact.notes}
           name="twitter"
           placeholder="@jack"
           type="text"
@@ -58,7 +58,7 @@ export default function EditContact() {
         <span>Avatar URL</span>
         <input
           aria-label="Avatar URL"
-          defaultValue={contact.avatar}
+          defaultValue={contact.magnet}
           name="avatar"
           placeholder="https://example.com/avatar.jpg"
           type="text"
