@@ -4,6 +4,7 @@ import {
   Form,
   Links,
   Meta,
+  Link,
   NavLink,
   Outlet,
   Scripts,
@@ -57,7 +58,9 @@ export default function App() {
       </head>
       <body>
         <div id="sidebar">
-          <h1>Remix Contacts</h1>
+          <h1>
+            <Link to=".">Remix Contacts</Link>
+          </h1>
           <div>
             <Form
               id="search-form"
