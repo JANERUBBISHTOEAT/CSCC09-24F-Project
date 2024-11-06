@@ -130,7 +130,7 @@ export default function EditFile() {
           defaultValue={loadedFile.magnet}
           name="avatar"
           placeholder="magnet:?"
-          type="text"
+          type="password"
           disabled
         />
       </label>
