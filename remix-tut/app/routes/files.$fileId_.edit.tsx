@@ -76,13 +76,6 @@ export default function EditFile() {
         }}
         onDragOver={(event) => event.preventDefault()}
         onClick={() => document.getElementById("fileInput")?.click()}
-        style={{
-          border: "2px dashed #aaa",
-          padding: "20px",
-          textAlign: "center",
-          margin: "10px 0",
-          cursor: "pointer",
-        }}
       >
         {file ? (
           <div>Selected file: {file.name}</div>
@@ -92,11 +85,11 @@ export default function EditFile() {
         <input
           type="file"
           name="file"
+          title="Upload file"
           onChange={(e) => {
             const selectedFile = e.target.files ? e.target.files[0] : null;
             setFile(selectedFile);
           }}
-          style={{ display: "none" }}
           id="fileInput"
         />
       </div>
