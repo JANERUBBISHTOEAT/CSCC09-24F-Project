@@ -14,7 +14,7 @@ import {
 } from "@remix-run/react";
 import { useEffect } from "react";
 import appStylesHref from "./app.css?url";
-import { createEmptyContact, getContacts } from "./data";
+import { createEmptyContact, getfiles } from "./data";
 
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: appStylesHref },
@@ -23,17 +23,17 @@ export const links: LinksFunction = () => [
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const url = new URL(request.url);
   const q = url.searchParams.get("q");
-  const contacts = await getContacts(q);
-  return json({ contacts, q });
+  const files = await getfiles(q);
+  return json({ files, q });
 };
 
 export const action = async () => {
   const contact = await createEmptyContact();
-  return redirect(`/contacts/${contact.id}/edit`);
+  return redirect(`/files/${contact.id}/edit`);
 };
 
 export default function App() {
-  const { contacts, q } = useLoaderData<typeof loader>();
+  const { files, q } = useLoaderData<typeof loader>();
   const navigation = useNavigation();
   const submit = useSubmit();
   const searching =
@@ -57,7 +57,7 @@ export default function App() {
       </head>
       <body>
         <div id="sidebar">
-          <h1>Remix Contacts</h1>
+          <h1>Remix files</h1>
           <div>
             <Form
               id="search-form"
@@ -73,7 +73,7 @@ export default function App() {
                 id="q"
                 className={searching ? "loading" : ""}
                 defaultValue={q || ""}
-                aria-label="Search contacts"
+                aria-label="Search files"
                 placeholder="Search"
                 type="search"
                 name="q"
@@ -85,16 +85,16 @@ export default function App() {
             </Form>
           </div>
           <nav>
-            {contacts.length ? (
+            {files.length ? (
               <ul>
-                {contacts.map((contact) => (
+                {files.map((contact) => (
                   <li key={contact.id}>
                     {" "}
                     <NavLink
                       className={({ isActive, isPending }) =>
                         isActive ? "active" : isPending ? "pending" : ""
                       }
-                      to={`contacts/${contact.id}`}
+                      to={`files/${contact.id}`}
                     >
                       {contact.first || contact.last ? (
                         <>
@@ -110,7 +110,7 @@ export default function App() {
               </ul>
             ) : (
               <p>
-                <i>No contacts</i>
+                <i>No files</i>
               </p>
             )}
           </nav>

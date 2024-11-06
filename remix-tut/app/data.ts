@@ -25,74 +25,74 @@ export type ContactRecord = ContactMutation & {
 ////////////////////////////////////////////////////////////////////////////////
 // This is just a fake DB table. In a real app you'd be talking to a real db or
 // fetching from an existing API.
-const fakeContacts = {
+const fakefiles = {
   records: {} as Record<string, ContactRecord>,
 
   async getAll(): Promise<ContactRecord[]> {
-    return Object.keys(fakeContacts.records)
-      .map((key) => fakeContacts.records[key])
+    return Object.keys(fakefiles.records)
+      .map((key) => fakefiles.records[key])
       .sort(sortBy("-createdAt", "last"));
   },
 
   async get(id: string): Promise<ContactRecord | null> {
-    return fakeContacts.records[id] || null;
+    return fakefiles.records[id] || null;
   },
 
   async create(values: ContactMutation): Promise<ContactRecord> {
     const id = values.id || Math.random().toString(36).substring(2, 9);
     const createdAt = new Date().toISOString();
     const newContact = { id, createdAt, ...values };
-    fakeContacts.records[id] = newContact;
+    fakefiles.records[id] = newContact;
     return newContact;
   },
 
   async set(id: string, values: ContactMutation): Promise<ContactRecord> {
-    const contact = await fakeContacts.get(id);
+    const contact = await fakefiles.get(id);
     invariant(contact, `No contact found for ${id}`);
     const updatedContact = { ...contact, ...values };
-    fakeContacts.records[id] = updatedContact;
+    fakefiles.records[id] = updatedContact;
     return updatedContact;
   },
 
   destroy(id: string): null {
-    delete fakeContacts.records[id];
+    delete fakefiles.records[id];
     return null;
   },
 };
 
 ////////////////////////////////////////////////////////////////////////////////
 // Handful of helper functions to be called from route loaders and actions
-export async function getContacts(query?: string | null) {
+export async function getfiles(query?: string | null) {
   await new Promise((resolve) => setTimeout(resolve, 500));
-  let contacts = await fakeContacts.getAll();
+  let files = await fakefiles.getAll();
   if (query) {
-    contacts = matchSorter(contacts, query, {
+    files = matchSorter(files, query, {
       keys: ["first", "last"],
     });
   }
-  return contacts.sort(sortBy("last", "createdAt"));
+  return files.sort(sortBy("last", "createdAt"));
 }
 
 export async function createEmptyContact() {
-  const contact = await fakeContacts.create({});
+  const contact = await fakefiles.create({});
   return contact;
 }
 
 export async function getContact(id: string) {
-  return fakeContacts.get(id);
+  return fakefiles.get(id);
 }
 
 export async function updateContact(id: string, updates: ContactMutation) {
-  const contact = await fakeContacts.get(id);
+  const contact = await fakefiles.get(id);
   if (!contact) {
     throw new Error(`No contact found for ${id}`);
   }
-  await fakeContacts.set(id, { ...contact, ...updates });
+  await fakefiles.set(id, { ...contact, ...updates });
   return contact;
 }
 
 export async function deleteContact(id: string) {
-  fakeContacts.destroy(id);
+  fakefiles.destroy(id);
 }
 
 [
@@ -309,7 +309,7 @@ export async function deleteContact(id: string) {
     twitter: "@jenseng",
   },
 ].forEach((contact) => {
-  fakeContacts.create({
+  fakefiles.create({
     ...contact,
     id: `${contact.first.toLowerCase()}-${contact.last.toLocaleLowerCase()}`,
   });
