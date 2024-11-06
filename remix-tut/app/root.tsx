@@ -1,8 +1,5 @@
 import type { LinksFunction } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
-
-import { createEmptyContact, getContacts } from "./data";
-
 import {
   Form,
   Links,
@@ -15,6 +12,7 @@ import {
   useNavigation,
 } from "@remix-run/react";
 import appStylesHref from "./app.css?url";
+import { createEmptyContact, getContacts } from "./data";
 
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: appStylesHref },
