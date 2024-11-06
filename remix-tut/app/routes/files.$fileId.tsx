@@ -4,16 +4,16 @@ import { json } from "@remix-run/node";
 import { Form, useFetcher, useLoaderData } from "@remix-run/react";
 import type { FunctionComponent } from "react";
 import invariant from "tiny-invariant";
-import type { ContactRecord } from "../data";
+import type { FileRecord } from "../data";
 import { getFile, updateFile } from "../data";
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   invariant(params.fileId, "Missing fileId param");
-  const contact = await getFile(params.fileId);
-  if (!contact) {
+  const file = await getFile(params.fileId);
+  if (!file) {
     throw new Response("Not Found", { status: 404 });
   }
-  return json({ contact });
+  return json({ file: file });
 };
 
 export const action = async ({ params, request }: ActionFunctionArgs) => {
@@ -24,40 +24,39 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
   });
 };
 
-export default function Contact() {
-  const { contact } = useLoaderData<typeof loader>();
+export default function File() {
+  const { file: file } = useLoaderData<typeof loader>();
 
   return (
     <div id="contact">
       <div>
         <img
-          alt={`${contact.first} ${contact.last} avatar`}
-          key={contact.avatar}
-          src={contact.avatar}
+          alt={`${file.filename} ${file.token} avatar`}
+          key={file.magnet}
+          src={file.magnet}
         />
       </div>
 
       <div>
         <h1>
-          {contact.first || contact.last ? (
+          {file.filename || file.token ? (
             <>
-              {contact.first} {contact.last}
+              {file.filename} {file.token}
             </>
           ) : (
             <i>No Name</i>
           )}{" "}
-          <Favorite contact={contact} />
+          <Favorite file={file} />
         </h1>
 
-        {contact.twitter ? (
+        {file.notes ? (
           <p>
-            <a href={`https://twitter.com/${contact.twitter}`}>
-              {contact.twitter}
-            </a>
+            Shared with
+            <a href={`https://twitter.com/${file.notes}`}>{file.notes}</a>
           </p>
         ) : null}
 
-        {contact.notes ? <p>{contact.notes}</p> : null}
+        {file.notes ? <p>{file.notes}</p> : null}
 
         <div>
           <Form action="edit">
@@ -85,12 +84,12 @@ export default function Contact() {
 }
 
 const Favorite: FunctionComponent<{
-  contact: Pick<ContactRecord, "favorite">;
-}> = ({ contact }) => {
+  file: Pick<FileRecord, "favorite">;
+}> = ({ file: file }) => {
   const fetcher = useFetcher();
   const favorite = fetcher.formData
     ? fetcher.formData.get("favorite") === "true"
-    : contact.favorite;
+    : file.favorite;
 
   return (
     <fetcher.Form method="post">

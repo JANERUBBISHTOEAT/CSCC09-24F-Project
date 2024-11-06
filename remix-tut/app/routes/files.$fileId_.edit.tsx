@@ -1,17 +1,17 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
-import { Form, useLoaderData, useNavigate } from "@remix-run/react";
+import { Form, useLoaderData, useNavigate, useSubmit } from "@remix-run/react";
+import { useState } from "react";
 import invariant from "tiny-invariant";
-
 import { getFile, updateFile } from "../data";
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   invariant(params.fileId, "Missing fileId param");
-  const contact = await getFile(params.fileId);
-  if (!contact) {
+  const file = await getFile(params.fileId);
+  if (!file) {
     throw new Response("Not Found", { status: 404 });
   }
-  return json({ contact });
+  return json({ file: file });
 };
 
 export const action = async ({ params, request }: ActionFunctionArgs) => {
@@ -22,51 +22,124 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
   return redirect(`/files/${params.fileId}`);
 };
 
-export default function EditContact() {
-  const { contact } = useLoaderData<typeof loader>();
+export default function EditFile() {
+  const { file: loadedFile } = useLoaderData<typeof loader>();
   const navigate = useNavigate();
 
+  const [file, setFile] = useState<File | null>(null);
+  const [dragging, setDragging] = useState(false);
+  const submit = useSubmit();
+
+  const handleDrop = (event: React.DragEvent) => {
+    event.preventDefault();
+    const droppedFile = event.dataTransfer.files[0];
+    if (droppedFile) {
+      setFile(droppedFile);
+    }
+    setDragging(false);
+  };
+
+  const handleDragOver = (event: React.DragEvent) => {
+    event.preventDefault();
+    setDragging(true);
+  };
+
+  const handleDragLeave = () => {
+    setDragging(false);
+  };
+
+  const handleSubmit = (event: React.FormEvent) => {
+    event.preventDefault();
+    if (file) {
+      const formData = new FormData();
+      formData.append("file", file);
+      submit(formData, { method: "post", encType: "multipart/form-data" });
+    }
+  };
+
   return (
-    <Form key={contact.id} id="contact-form" method="post">
+    // File drop zone
+    <Form
+      key={loadedFile.id}
+      id="contact-form"
+      method="post"
+      encType="multipart/form-data"
+    >
+      <div
+        // htmlFor="fileInput"
+        onDrop={(event) => {
+          event.preventDefault();
+          const droppedFile = event.dataTransfer.files[0];
+          if (droppedFile) {
+            setFile(droppedFile);
+          }
+        }}
+        onDragOver={(event) => event.preventDefault()}
+        onClick={() => document.getElementById("fileInput")?.click()}
+        style={{
+          border: "2px dashed #aaa",
+          padding: "20px",
+          textAlign: "center",
+          margin: "10px 0",
+          cursor: "pointer",
+        }}
+      >
+        {file ? (
+          <div>Selected file: {file.name}</div>
+        ) : (
+          <div>Drag & Drop files here</div>
+        )}
+        <input
+          type="file"
+          name="file"
+          onChange={(e) => {
+            const selectedFile = e.target.files ? e.target.files[0] : null;
+            setFile(selectedFile);
+          }}
+          style={{ display: "none" }}
+          id="fileInput"
+        />
+      </div>
+
       <p>
         <span>Name</span>
         <input
-          aria-label="First name"
-          defaultValue={contact.first}
-          name="first"
-          placeholder="First"
+          aria-label="Filename"
+          defaultValue={loadedFile.filename}
+          name="filename"
+          placeholder="Filename"
           type="text"
         />
         <input
-          aria-label="Last name"
-          defaultValue={contact.last}
-          name="last"
-          placeholder="Last"
+          aria-label="Token"
+          defaultValue={loadedFile.token}
+          name="token"
+          placeholder="Token"
           type="text"
         />
       </p>
       <label>
-        <span>Twitter</span>
+        <span>Share with</span>
         <input
-          defaultValue={contact.twitter}
-          name="twitter"
-          placeholder="@jack"
+          defaultValue={loadedFile.notes}
+          name="notes"
+          placeholder="TODO"
           type="text"
         />
       </label>
       <label>
-        <span>Avatar URL</span>
+        <span>File Link</span>
         <input
-          aria-label="Avatar URL"
-          defaultValue={contact.avatar}
+          aria-label="File Link"
+          defaultValue={loadedFile.magnet}
           name="avatar"
-          placeholder="https://example.com/avatar.jpg"
+          placeholder="magnet:?"
           type="text"
         />
       </label>
       <label>
         <span>Notes</span>
-        <textarea defaultValue={contact.notes} name="notes" rows={6} />
+        <textarea defaultValue={loadedFile.notes} name="notes" rows={6} />
       </label>
       <p>
         <button type="submit">Save</button>

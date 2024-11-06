@@ -24,16 +24,16 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   const url = new URL(request.url);
   const q = url.searchParams.get("q");
   const files = await getFiles(q);
-  return json({ files, q });
+  return json({ files: files, q });
 };
 
 export const action = async () => {
-  const contact = await createEmptyFile();
-  return redirect(`/files/${contact.id}/edit`);
+  const file = await createEmptyFile();
+  return redirect(`/files/${file.id}/edit`);
 };
 
 export default function App() {
-  const { files, q } = useLoaderData<typeof loader>();
+  const { files: files, q } = useLoaderData<typeof loader>();
   const navigation = useNavigation();
   const submit = useSubmit();
   const searching =
@@ -57,7 +57,7 @@ export default function App() {
       </head>
       <body>
         <div id="sidebar">
-          <h1>Remix files</h1>
+          <h1>Remix Contacts</h1>
           <div>
             <Form
               id="search-form"
@@ -87,23 +87,23 @@ export default function App() {
           <nav>
             {files.length ? (
               <ul>
-                {files.map((contact) => (
-                  <li key={contact.id}>
+                {files.map((file) => (
+                  <li key={file.id}>
                     {" "}
                     <NavLink
                       className={({ isActive, isPending }) =>
                         isActive ? "active" : isPending ? "pending" : ""
                       }
-                      to={`files/${contact.id}`}
+                      to={`files/${file.id}`}
                     >
-                      {contact.first || contact.last ? (
+                      {file.filename || file.token ? (
                         <>
-                          {contact.first} {contact.last}
+                          {file.filename} {file.token}
                         </>
                       ) : (
                         <i>No Name</i>
                       )}{" "}
-                      {contact.favorite ? <span>★</span> : null}
+                      {file.favorite ? <span>★</span> : null}
                     </NavLink>
                   </li>
                 ))}
