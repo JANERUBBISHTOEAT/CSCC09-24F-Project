@@ -3,43 +3,43 @@ import { json, redirect } from "@remix-run/node";
 import { Form, useLoaderData, useNavigate } from "@remix-run/react";
 import invariant from "tiny-invariant";
 
-import { getContact, updateContact } from "../data";
+import { getFile, updateFile } from "../data";
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
-  invariant(params.contactId, "Missing contactId param");
-  const contact = await getContact(params.contactId);
-  if (!contact) {
+  invariant(params.fileId, "Missing fileId param");
+  const file = await getFile(params.fileId);
+  if (!file) {
     throw new Response("Not Found", { status: 404 });
   }
-  return json({ contact });
+  return json({ file: file });
 };
 
 export const action = async ({ params, request }: ActionFunctionArgs) => {
-  invariant(params.contactId, "Missing contactId param");
+  invariant(params.fileId, "Missing fileId param");
   const formData = await request.formData();
   const updates = Object.fromEntries(formData);
-  await updateContact(params.contactId, updates);
-  return redirect(`/contacts/${params.contactId}`);
+  await updateFile(params.fileId, updates);
+  return redirect(`/files/${params.fileId}`);
 };
 
-export default function EditContact() {
-  const { contact } = useLoaderData<typeof loader>();
+export default function EditFile() {
+  const { file: file } = useLoaderData<typeof loader>();
   const navigate = useNavigate();
 
   return (
-    <Form key={contact.id} id="contact-form" method="post">
+    <Form key={file.id} id="contact-form" method="post">
       <p>
         <span>Name</span>
         <input
           aria-label="First name"
-          defaultValue={contact.filename}
+          defaultValue={file.filename}
           name="first"
           placeholder="First"
           type="text"
         />
         <input
           aria-label="Last name"
-          defaultValue={contact.token}
+          defaultValue={file.token}
           name="last"
           placeholder="Last"
           type="text"
@@ -48,7 +48,7 @@ export default function EditContact() {
       <label>
         <span>Twitter</span>
         <input
-          defaultValue={contact.notes}
+          defaultValue={file.notes}
           name="twitter"
           placeholder="@jack"
           type="text"
@@ -58,7 +58,7 @@ export default function EditContact() {
         <span>Avatar URL</span>
         <input
           aria-label="Avatar URL"
-          defaultValue={contact.magnet}
+          defaultValue={file.magnet}
           name="avatar"
           placeholder="https://example.com/avatar.jpg"
           type="text"
@@ -66,7 +66,7 @@ export default function EditContact() {
       </label>
       <label>
         <span>Notes</span>
-        <textarea defaultValue={contact.notes} name="notes" rows={6} />
+        <textarea defaultValue={file.notes} name="notes" rows={6} />
       </label>
       <p>
         <button type="submit">Save</button>

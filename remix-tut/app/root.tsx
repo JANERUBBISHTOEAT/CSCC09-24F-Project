@@ -14,7 +14,7 @@ import {
 } from "@remix-run/react";
 import { useEffect } from "react";
 import appStylesHref from "./app.css?url";
-import { createEmptyContact, getContacts } from "./data";
+import { createEmptyFile, getFiles } from "./data";
 
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: appStylesHref },
@@ -23,17 +23,17 @@ export const links: LinksFunction = () => [
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const url = new URL(request.url);
   const q = url.searchParams.get("q");
-  const contacts = await getContacts(q);
-  return json({ contacts, q });
+  const files = await getFiles(q);
+  return json({ files: files, q });
 };
 
 export const action = async () => {
-  const contact = await createEmptyContact();
-  return redirect(`/contacts/${contact.id}/edit`);
+  const file = await createEmptyFile();
+  return redirect(`/files/${file.id}/edit`);
 };
 
 export default function App() {
-  const { contacts, q } = useLoaderData<typeof loader>();
+  const { files: files, q } = useLoaderData<typeof loader>();
   const navigation = useNavigation();
   const submit = useSubmit();
   const searching =
@@ -73,7 +73,7 @@ export default function App() {
                 id="q"
                 className={searching ? "loading" : ""}
                 defaultValue={q || ""}
-                aria-label="Search contacts"
+                aria-label="Search files"
                 placeholder="Search"
                 type="search"
                 name="q"
@@ -85,32 +85,32 @@ export default function App() {
             </Form>
           </div>
           <nav>
-            {contacts.length ? (
+            {files.length ? (
               <ul>
-                {contacts.map((contact) => (
-                  <li key={contact.id}>
+                {files.map((file) => (
+                  <li key={file.id}>
                     {" "}
                     <NavLink
                       className={({ isActive, isPending }) =>
                         isActive ? "active" : isPending ? "pending" : ""
                       }
-                      to={`contacts/${contact.id}`}
+                      to={`files/${file.id}`}
                     >
-                      {contact.filename || contact.token ? (
+                      {file.filename || file.token ? (
                         <>
-                          {contact.filename} {contact.token}
+                          {file.filename} {file.token}
                         </>
                       ) : (
                         <i>No Name</i>
                       )}{" "}
-                      {contact.favorite ? <span>★</span> : null}
+                      {file.favorite ? <span>★</span> : null}
                     </NavLink>
                   </li>
                 ))}
               </ul>
             ) : (
               <p>
-                <i>No contacts</i>
+                <i>No files</i>
               </p>
             )}
           </nav>

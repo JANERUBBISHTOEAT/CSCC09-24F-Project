@@ -16,7 +16,7 @@ type FileMutation = {
   favorite?: boolean;
 };
 
-export type ContactRecord = FileMutation & {
+export type FileRecord = FileMutation & {
   id: string;
   createdAt: string;
 };
@@ -24,74 +24,74 @@ export type ContactRecord = FileMutation & {
 ////////////////////////////////////////////////////////////////////////////////
 // This is just a fake DB table. In a real app you'd be talking to a real db or
 // fetching from an existing API.
-const fakeContacts = {
-  records: {} as Record<string, ContactRecord>,
+const fakeFiles = {
+  records: {} as Record<string, FileRecord>,
 
-  async getAll(): Promise<ContactRecord[]> {
-    return Object.keys(fakeContacts.records)
-      .map((key) => fakeContacts.records[key])
+  async getAll(): Promise<FileRecord[]> {
+    return Object.keys(fakeFiles.records)
+      .map((key) => fakeFiles.records[key])
       .sort(sortBy("-createdAt", "last"));
   },
 
-  async get(id: string): Promise<ContactRecord | null> {
-    return fakeContacts.records[id] || null;
+  async get(id: string): Promise<FileRecord | null> {
+    return fakeFiles.records[id] || null;
   },
 
-  async create(values: FileMutation): Promise<ContactRecord> {
+  async create(values: FileMutation): Promise<FileRecord> {
     const id = values.id || Math.random().toString(36).substring(2, 9);
     const createdAt = new Date().toISOString();
-    const newContact = { id, createdAt, ...values };
-    fakeContacts.records[id] = newContact;
-    return newContact;
+    const newFile = { id, createdAt, ...values };
+    fakeFiles.records[id] = newFile;
+    return newFile;
   },
 
-  async set(id: string, values: FileMutation): Promise<ContactRecord> {
-    const contact = await fakeContacts.get(id);
-    invariant(contact, `No contact found for ${id}`);
-    const updatedContact = { ...contact, ...values };
-    fakeContacts.records[id] = updatedContact;
-    return updatedContact;
+  async set(id: string, values: FileMutation): Promise<FileRecord> {
+    const file = await fakeFiles.get(id);
+    invariant(file, `No file found for ${id}`);
+    const updatedFile = { ...file, ...values };
+    fakeFiles.records[id] = updatedFile;
+    return updatedFile;
   },
 
   destroy(id: string): null {
-    delete fakeContacts.records[id];
+    delete fakeFiles.records[id];
     return null;
   },
 };
 
 ////////////////////////////////////////////////////////////////////////////////
 // Handful of helper functions to be called from route loaders and actions
-export async function getContacts(query?: string | null) {
+export async function getFiles(query?: string | null) {
   await new Promise((resolve) => setTimeout(resolve, 500));
-  let contacts = await fakeContacts.getAll();
+  let files = await fakeFiles.getAll();
   if (query) {
-    contacts = matchSorter(contacts, query, {
+    files = matchSorter(files, query, {
       keys: ["filename", "token"],
     });
   }
-  return contacts.sort(sortBy("last", "createdAt"));
+  return files.sort(sortBy("last", "createdAt"));
 }
 
-export async function createEmptyContact() {
-  const contact = await fakeContacts.create({});
-  return contact;
+export async function createEmptyFile() {
+  const file = await fakeFiles.create({});
+  return file;
 }
 
-export async function getContact(id: string) {
-  return fakeContacts.get(id);
+export async function getFile(id: string) {
+  return fakeFiles.get(id);
 }
 
-export async function updateContact(id: string, updates: FileMutation) {
-  const contact = await fakeContacts.get(id);
-  if (!contact) {
-    throw new Error(`No contact found for ${id}`);
+export async function updateFile(id: string, updates: FileMutation) {
+  const file = await fakeFiles.get(id);
+  if (!file) {
+    throw new Error(`No file found for ${id}`);
   }
-  await fakeContacts.set(id, { ...contact, ...updates });
-  return contact;
+  await fakeFiles.set(id, { ...file, ...updates });
+  return file;
 }
 
-export async function deleteContact(id: string) {
-  fakeContacts.destroy(id);
+export async function deleteFile(id: string) {
+  fakeFiles.destroy(id);
 }
 
 [
@@ -307,9 +307,9 @@ export async function deleteContact(id: string) {
     token: "Jensen",
     notes: "@jenseng",
   },
-].forEach((contact) => {
-  fakeContacts.create({
-    ...contact,
-    id: `${contact.filename.toLowerCase()}-${contact.token.toLocaleLowerCase()}`,
+].forEach((file) => {
+  fakeFiles.create({
+    ...file,
+    id: `${file.filename.toLowerCase()}-${file.token.toLocaleLowerCase()}`,
   });
 });

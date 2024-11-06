@@ -4,58 +4,58 @@ import { json } from "@remix-run/node";
 import { Form, useFetcher, useLoaderData } from "@remix-run/react";
 import type { FunctionComponent } from "react";
 import invariant from "tiny-invariant";
-import type { ContactRecord } from "../data";
-import { getContact, updateContact } from "../data";
+import type { FileRecord } from "../data";
+import { getFile, updateFile } from "../data";
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
-  invariant(params.contactId, "Missing contactId param");
-  const contact = await getContact(params.contactId);
-  if (!contact) {
+  invariant(params.fileId, "Missing fileId param");
+  const file = await getFile(params.fileId);
+  if (!file) {
     throw new Response("Not Found", { status: 404 });
   }
-  return json({ contact });
+  return json({ file: file });
 };
 
 export const action = async ({ params, request }: ActionFunctionArgs) => {
-  invariant(params.contactId, "Missing contactId param");
+  invariant(params.fileId, "Missing fileId param");
   const formData = await request.formData();
-  return updateContact(params.contactId, {
+  return updateFile(params.fileId, {
     favorite: formData.get("favorite") === "true",
   });
 };
 
-export default function Contact() {
-  const { contact } = useLoaderData<typeof loader>();
+export default function File() {
+  const { file: file } = useLoaderData<typeof loader>();
 
   return (
     <div id="contact">
       <div>
         <img
-          alt={`${contact.filename} ${contact.token} avatar`}
-          key={contact.magnet}
-          src={contact.magnet}
+          alt={`${file.filename} ${file.token} avatar`}
+          key={file.magnet}
+          src={file.magnet}
         />
       </div>
 
       <div>
         <h1>
-          {contact.filename || contact.token ? (
+          {file.filename || file.token ? (
             <>
-              {contact.filename} {contact.token}
+              {file.filename} {file.token}
             </>
           ) : (
             <i>No Name</i>
           )}{" "}
-          <Favorite contact={contact} />
+          <Favorite file={file} />
         </h1>
 
-        {contact.notes ? (
+        {file.notes ? (
           <p>
-            <a href={`https://twitter.com/${contact.notes}`}>{contact.notes}</a>
+            <a href={`https://twitter.com/${file.notes}`}>{file.notes}</a>
           </p>
         ) : null}
 
-        {contact.notes ? <p>{contact.notes}</p> : null}
+        {file.notes ? <p>{file.notes}</p> : null}
 
         <div>
           <Form action="edit">
@@ -83,12 +83,12 @@ export default function Contact() {
 }
 
 const Favorite: FunctionComponent<{
-  contact: Pick<ContactRecord, "favorite">;
-}> = ({ contact }) => {
+  file: Pick<FileRecord, "favorite">;
+}> = ({ file: file }) => {
   const fetcher = useFetcher();
   const favorite = fetcher.formData
     ? fetcher.formData.get("favorite") === "true"
-    : contact.favorite;
+    : file.favorite;
 
   return (
     <fetcher.Form method="post">
