@@ -77,10 +77,18 @@ export default function EditFile() {
     console.log("Client:", client);
     console.log("Files:", files);
     if (client && files) {
-      const file = files[0];
+      const file = files[0]; // TODO： Support multiple files
       client.seed(file, (torrent) => {
         setTorrent(torrent);
         console.log("Client is seeding:", torrent.magnetURI);
+        Swal.fire({
+          icon: "success",
+          title: "File uploaded!",
+          text: "Your link is ready for sharing 🎉",
+          showConfirmButton: false,
+          timer: 2500,
+          timerProgressBar: true,
+        });
       });
     }
   };
@@ -93,13 +101,6 @@ export default function EditFile() {
         () => {
           console.log("Text copied to clipboard");
           toastr.success("Copied to clipboard");
-          // Swal.fire({
-          //   icon: "success",
-          //   title: "Copied to clipboard!",
-          //   showConfirmButton: false,
-          //   timer: 1500,
-          //   timerProgressBar: true,
-          // });
         },
         (err) => {
           console.error("Failed to copy text: ", err);
@@ -124,6 +125,7 @@ export default function EditFile() {
           const droppedFile = event.dataTransfer.files[0];
           if (droppedFile) {
             setFile(droppedFile);
+            handleSubmit(event.dataTransfer.files);
           }
         }}
         onDragOver={(event) => event.preventDefault()}
