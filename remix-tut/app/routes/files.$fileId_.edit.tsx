@@ -3,7 +3,10 @@ import { json, redirect } from "@remix-run/node";
 import { Form, useLoaderData, useNavigate, useSubmit } from "@remix-run/react";
 import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
+import "sweetalert2/dist/sweetalert2.min.css";
 import invariant from "tiny-invariant";
+import toastr from "toastr";
+import "toastr/build/toastr.min.css";
 import { getFile, updateFile } from "../data";
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
@@ -89,6 +92,7 @@ export default function EditFile() {
       navigator.clipboard.writeText(link.value).then(
         () => {
           console.log("Text copied to clipboard");
+          toastr.success("Copied to clipboard");
           // Swal.fire({
           //   icon: "success",
           //   title: "Copied to clipboard!",
@@ -99,6 +103,7 @@ export default function EditFile() {
         },
         (err) => {
           console.error("Failed to copy text: ", err);
+          toastr.error("Failed to copy text");
         }
       );
     }
@@ -174,7 +179,6 @@ export default function EditFile() {
       <label>
         <span>File Link</span>
         <input
-          aria-label="File Link"
           defaultValue={loadedFile.magnet}
           name="link"
           value={torrent?.magnetURI}
