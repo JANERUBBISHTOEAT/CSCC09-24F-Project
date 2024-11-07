@@ -4,16 +4,6 @@ import { Form, useLoaderData, useNavigate, useSubmit } from "@remix-run/react";
 import { useEffect, useState } from "react";
 import invariant from "tiny-invariant";
 import { getFile, updateFile } from "../data";
-import WebTorrent from "webtorrent"; // Node.js
-// import WebTorrent from "../../public/webtorrent.min.js"; // Browser
-// ! Browser version: 10:47:09 PM [vite] Internal server error: self is not defined
-// ! Node.js version: index.js:614  Uncaught TypeError: Class extends value undefined is not a constructor or null
-// at node_modules/streamx/index.js (index.js:614:1)
-// ?                ^ This is believed to be Node.js specific error but we are already in the browser
-// at __require (chunk-4VLOCLCM.js?v=5cfa2b23:15:50)
-// at peer.js:2:37
-// ! HTML embed: import no complain, but module not found anywhere (waited)
-const client = new WebTorrent(); // !
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   invariant(params.fileId, "Missing fileId param");
@@ -47,7 +37,34 @@ export default function EditFile() {
     } else {
       console.log("Running on the server. (Node.js/SSR)");
     }
-    // import WebTorrent from "./webtorrent.min.js";
+
+    const loadWebTorrent = async () => {
+      // Get URL to conform to Vite's policy
+      const webTorrentUrl = new URL(
+        "/webtorrent.min.js",
+        import.meta.url
+      ).toString();
+
+      console.log("Loading WebTorrent from:", webTorrentUrl);
+
+      // TODO: Load WebTorrent script better
+      const script = document.createElement("script");
+      script.src = webTorrentUrl;
+      script.type = "module";
+      script.onload = () => {
+        console.log("WebTorrent loaded");
+        const client = new WebTorrent();
+        setClient(client);
+      };
+      script.onerror = () => {
+        console.error("WebTorrent failed to load");
+      };
+      document.head.appendChild(script);
+    };
+
+    !window.WebTorrent
+      ? loadWebTorrent()
+      : console.log("WebTorrent already loaded");
   });
 
   const handleSubmit = (files: FileList | null) => {
@@ -139,7 +156,8 @@ export default function EditFile() {
           name="link"
           value={torrent?.magnetURI}
           placeholder="magnet:?"
-          type="password"
+          type="text"
+          // type="password"
           disabled
         />
       </label>
