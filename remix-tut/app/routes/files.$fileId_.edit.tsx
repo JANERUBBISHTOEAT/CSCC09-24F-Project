@@ -6,8 +6,8 @@ import invariant from "tiny-invariant";
 import { getFile, updateFile } from "../data";
 import WebTorrent from "webtorrent"; // Node.js
 // import WebTorrent from "../../public/webtorrent.min.js"; // Browser
-// ! Browser side import: 10:47:09 PM [vite] Internal server error: self is not defined
-// ! Node.js side import: index.js:614  Uncaught TypeError: Class extends value undefined is not a constructor or null
+// ! Browser version: 10:47:09 PM [vite] Internal server error: self is not defined
+// ! Node.js version: index.js:614  Uncaught TypeError: Class extends value undefined is not a constructor or null
 // at node_modules/streamx/index.js (index.js:614:1)
 // ?                ^ This is believed to be Node.js specific error but we are already in the browser
 // at __require (chunk-4VLOCLCM.js?v=5cfa2b23:15:50)
