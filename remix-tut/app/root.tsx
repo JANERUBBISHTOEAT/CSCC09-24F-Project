@@ -57,6 +57,10 @@ export default function App() {
         <Links />
       </head>
       <body>
+        {/* <script type="module">
+          import WebTorrent from 'webtorrent.min.js'
+        </script> */}
+        {/* ! HTML embed: import no complain, but module not found anywhere (waited) */}
         <div id="sidebar">
           <h1>
             <Link to=".">Remix Contacts</Link>

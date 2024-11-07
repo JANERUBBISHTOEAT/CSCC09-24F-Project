@@ -4,8 +4,16 @@ import { Form, useLoaderData, useNavigate, useSubmit } from "@remix-run/react";
 import { useEffect, useState } from "react";
 import invariant from "tiny-invariant";
 import { getFile, updateFile } from "../data";
-// import WebTorrent from "webtorrent";
-// import WebTorrent from "../../public/webtorrent.min.js";
+import WebTorrent from "webtorrent"; // Node.js
+// import WebTorrent from "../../public/webtorrent.min.js"; // Browser
+// ! Browser side import: 10:47:09 PM [vite] Internal server error: self is not defined
+// ! Node.js side import: index.js:614  Uncaught TypeError: Class extends value undefined is not a constructor or null
+// at node_modules/streamx/index.js (index.js:614:1)
+// ?                ^ This is believed to be Node.js specific error but we are already in the browser
+// at __require (chunk-4VLOCLCM.js?v=5cfa2b23:15:50)
+// at peer.js:2:37
+// ! HTML embed: import no complain, but module not found anywhere (waited)
+const client = new WebTorrent(); // !
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   invariant(params.fileId, "Missing fileId param");
@@ -39,31 +47,7 @@ export default function EditFile() {
     } else {
       console.log("Running on the server. (Node.js/SSR)");
     }
-    // if (typeof window !== "undefined") {
-    //   // import("webtorrent")
-    //   import("../../public/webtorrent.min.js")
-    //     .then((WebTorrent) => {
-    //       const client = new WebTorrent();
-    //       setClient(client);
-    //     })
-    //     .catch((error) => {
-    //       console.error("Failed to load WebTorrent:", error);
-    //     });
-    // }
-    console.log("WebTorrent:", window.WebTorrent);
-    if (typeof window !== "undefined" && window.WebTorrent) {
-      const client = new window.WebTorrent();
-      setClient(client);
-    } else {
-      const interval = setInterval(() => {
-        console.log("Checking for WebTorrent...");
-        if (window.WebTorrent) {
-          console.log("WebTorrent loaded:", window.WebTorrent);
-          setClient(client);
-          clearInterval(interval);
-        }
-      }, 100);
-    }
+    // import WebTorrent from "./webtorrent.min.js";
   });
 
   const handleSubmit = (files: FileList | null) => {
