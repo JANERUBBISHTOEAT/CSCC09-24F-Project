@@ -62,9 +62,9 @@ export default function App() {
         </script> */}
         {/* ! HTML embed: import no complain, but module not found anywhere (waited) */}
         <div id="sidebar">
-          <h1>
-            <Link to=".">Remix Contacts</Link>
-          </h1>
+          <Link to=".">
+            <h1>Remix Contacts</h1>
+          </Link>
           <div>
             <Form
               id="search-form"
