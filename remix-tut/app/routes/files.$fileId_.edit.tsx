@@ -172,16 +172,17 @@ export default function EditFile() {
         <span>Name</span>
         <input
           aria-label="Filename"
-          defaultValue={loadedFile.filename || ""}
           name="filename"
+          defaultValue={loadedFile.filename || ""}
+          value={file?.name}
           placeholder="Filename"
           type="text"
           disabled
         />
         <input
           aria-label="Token"
-          defaultValue={loadedFile.token || ""}
           name="token"
+          defaultValue={loadedFile.token || ""}
           placeholder="Token"
           type="text"
           disabled
@@ -200,8 +201,8 @@ export default function EditFile() {
       <label>
         <span>File Link</span>
         <input
-          defaultValue={loadedFile.magnet || ""}
           name="link"
+          defaultValue={loadedFile.magnet || ""}
           value={torrent?.magnetURI}
           placeholder="magnet:?"
           type="text"
