@@ -10,8 +10,10 @@ import invariant from "tiny-invariant";
 type FileMutation = {
   id?: string;
   filename?: string;
+  type?: string;
+  size?: number;
   magnet?: string;
-  token?: string; // should be a number
+  token?: number;
   notes?: string;
   favorite?: boolean;
 };
@@ -19,6 +21,14 @@ type FileMutation = {
 export type FileRecord = FileMutation & {
   id: string;
   createdAt: string;
+};
+
+export const fileIconMap = {
+  "application/pdf": "fas fa-file-pdf",
+  "application/zip": "fas fa-file-archive",
+  "image/jpeg": "fas fa-file-image",
+  "image/png": "fas fa-file-image",
+  "text/plain": "fas fa-file-alt",
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -96,220 +106,29 @@ export async function deleteFile(id: string) {
 
 [
   {
-    magnet:
-      "https://sessionize.com/image/124e-400o400o2-wHVdAuNaxi8KJrgtN3ZKci.jpg",
-    filename: "Shruti",
-    token: "Kapoor",
-    notes: "@shrutikapoor08",
+    magnet: "magnet:?xt=...",
+    filename: "file.pdf",
+    type: "application/pdf",
+    token: 100100,
+    notes: "Hello world",
   },
   {
-    magnet:
-      "https://sessionize.com/image/1940-400o400o2-Enh9dnYmrLYhJSTTPSw3MH.jpg",
-    filename: "Glenn",
-    token: "Reyes",
-    notes: "@glnnrys",
+    magnet: "magnet:?xt=...",
+    filename: "file.txt",
+    type: "text/plain",
+    token: 200200,
+    notes: "",
   },
   {
-    magnet:
-      "https://sessionize.com/image/9273-400o400o2-3tyrUE3HjsCHJLU5aUJCja.jpg",
-    filename: "Ryan",
-    token: "Florence",
-  },
-  {
-    magnet:
-      "https://sessionize.com/image/d14d-400o400o2-pyB229HyFPCnUcZhHf3kWS.png",
-    filename: "Oscar",
-    token: "Newman",
-    notes: "@__oscarnewman",
-  },
-  {
-    magnet:
-      "https://sessionize.com/image/fd45-400o400o2-fw91uCdGU9hFP334dnyVCr.jpg",
-    filename: "Michael",
-    token: "Jackson",
-  },
-  {
-    magnet:
-      "https://sessionize.com/image/b07e-400o400o2-KgNRF3S9sD5ZR4UsG7hG4g.jpg",
-    filename: "Christopher",
-    token: "Chedeau",
-    notes: "@Vjeux",
-  },
-  {
-    magnet:
-      "https://sessionize.com/image/262f-400o400o2-UBPQueK3fayaCmsyUc1Ljf.jpg",
-    filename: "Cameron",
-    token: "Matheson",
-    notes: "@cmatheson",
-  },
-  {
-    magnet:
-      "https://sessionize.com/image/820b-400o400o2-Ja1KDrBAu5NzYTPLSC3GW8.jpg",
-    filename: "Brooks",
-    token: "Lybrand",
-    notes: "@BrooksLybrand",
-  },
-  {
-    magnet:
-      "https://sessionize.com/image/df38-400o400o2-JwbChVUj6V7DwZMc9vJEHc.jpg",
-    filename: "Alex",
-    token: "Anderson",
-    notes: "@ralex1993",
-  },
-  {
-    magnet:
-      "https://sessionize.com/image/5578-400o400o2-BMT43t5kd2U1XstaNnM6Ax.jpg",
-    filename: "Kent C.",
-    token: "Dodds",
-    notes: "@kentcdodds",
-  },
-  {
-    magnet:
-      "https://sessionize.com/image/c9d5-400o400o2-Sri5qnQmscaJXVB8m3VBgf.jpg",
-    filename: "Nevi",
-    token: "Shah",
-    notes: "@nevikashah",
-  },
-  {
-    magnet:
-      "https://sessionize.com/image/2694-400o400o2-MYYTsnszbLKTzyqJV17w2q.png",
-    filename: "Andrew",
-    token: "Petersen",
-  },
-  {
-    magnet:
-      "https://sessionize.com/image/907a-400o400o2-9TM2CCmvrw6ttmJiTw4Lz8.jpg",
-    filename: "Scott",
-    token: "Smerchek",
-    notes: "@smerchek",
-  },
-  {
-    magnet:
-      "https://sessionize.com/image/08be-400o400o2-WtYGFFR1ZUJHL9tKyVBNPV.jpg",
-    filename: "Giovanni",
-    token: "Benussi",
-    notes: "@giovannibenussi",
-  },
-  {
-    magnet:
-      "https://sessionize.com/image/f814-400o400o2-n2ua5nM9qwZA2hiGdr1T7N.jpg",
-    filename: "Igor",
-    token: "Minar",
-    notes: "@IgorMinar",
-  },
-  {
-    magnet:
-      "https://sessionize.com/image/fb82-400o400o2-LbvwhTVMrYLDdN3z4iEFMp.jpeg",
-    filename: "Brandon",
-    token: "Kish",
-  },
-  {
-    magnet:
-      "https://sessionize.com/image/fcda-400o400o2-XiYRtKK5Dvng5AeyC8PiUA.png",
-    filename: "Arisa",
-    token: "Fukuzaki",
-    notes: "@arisa_dev",
-  },
-  {
-    magnet:
-      "https://sessionize.com/image/c8c3-400o400o2-PR5UsgApAVEADZRixV4H8e.jpeg",
-    filename: "Alexandra",
-    token: "Spalato",
-    notes: "@alexadark",
-  },
-  {
-    magnet:
-      "https://sessionize.com/image/7594-400o400o2-hWtdCjbdFdLgE2vEXBJtyo.jpg",
-    filename: "Cat",
-    token: "Johnson",
-  },
-  {
-    magnet:
-      "https://sessionize.com/image/5636-400o400o2-TWgi8vELMFoB3hB9uPw62d.jpg",
-    filename: "Ashley",
-    token: "Narcisse",
-    notes: "@_darkfadr",
-  },
-  {
-    magnet:
-      "https://sessionize.com/image/6aeb-400o400o2-Q5tAiuzKGgzSje9ZsK3Yu5.JPG",
-    filename: "Edmund",
-    token: "Hung",
-    notes: "@_edmundhung",
-  },
-  {
-    magnet:
-      "https://sessionize.com/image/30f1-400o400o2-wJBdJ6sFayjKmJycYKoHSe.jpg",
-    filename: "Clifford",
-    token: "Fajardo",
-    notes: "@cliffordfajard0",
-  },
-  {
-    magnet:
-      "https://sessionize.com/image/6faa-400o400o2-amseBRDkdg7wSK5tjsFDiG.jpg",
-    filename: "Erick",
-    token: "Tamayo",
-    notes: "@ericktamayo",
-  },
-  {
-    magnet:
-      "https://sessionize.com/image/feba-400o400o2-R4GE7eqegJNFf3cQ567obs.jpg",
-    filename: "Paul",
-    token: "Bratslavsky",
-    notes: "@codingthirty",
-  },
-  {
-    magnet:
-      "https://sessionize.com/image/c315-400o400o2-spjM5A6VVfVNnQsuwvX3DY.jpg",
-    filename: "Pedro",
-    token: "Cattori",
-    notes: "@pcattori",
-  },
-  {
-    magnet:
-      "https://sessionize.com/image/eec1-400o400o2-HkvWKLFqecmFxLwqR9KMRw.jpg",
-    filename: "Andre",
-    token: "Landgraf",
-    notes: "@AndreLandgraf94",
-  },
-  {
-    magnet:
-      "https://sessionize.com/image/c73a-400o400o2-4MTaTq6ftC15hqwtqUJmTC.jpg",
-    filename: "Monica",
-    token: "Powell",
-    notes: "@indigitalcolor",
-  },
-  {
-    magnet:
-      "https://sessionize.com/image/cef7-400o400o2-KBZUydbjfkfGACQmjbHEvX.jpeg",
-    filename: "Brian",
-    token: "Lee",
-    notes: "@brian_dlee",
-  },
-  {
-    magnet:
-      "https://sessionize.com/image/f83b-400o400o2-Pyw3chmeHMxGsNoj3nQmWU.jpg",
-    filename: "Sean",
-    token: "McQuaid",
-    notes: "@SeanMcQuaidCode",
-  },
-  {
-    magnet:
-      "https://sessionize.com/image/a9fc-400o400o2-JHBnWZRoxp7QX74Hdac7AZ.jpg",
-    filename: "Shane",
-    token: "Walker",
-    notes: "@swalker326",
-  },
-  {
-    magnet:
-      "https://sessionize.com/image/6644-400o400o2-aHnGHb5Pdu3D32MbfrnQbj.jpg",
-    filename: "Jon",
-    token: "Jensen",
-    notes: "@jenseng",
+    magnet: "magnet:?xt=...",
+    filename: "file.zip",
+    type: "application/zip",
+    token: 300300,
+    notes: "",
   },
 ].forEach((file) => {
   fakeFiles.create({
     ...file,
-    id: `${file.filename.toLowerCase()}-${file.token.toLocaleLowerCase()}`,
+    id: `${file.filename.toLowerCase()}-${file.token}`,
   });
 });

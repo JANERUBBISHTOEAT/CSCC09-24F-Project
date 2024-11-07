@@ -1,11 +1,11 @@
+import "@fortawesome/fontawesome-free/css/all.min.css";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
-
 import { Form, useFetcher, useLoaderData } from "@remix-run/react";
 import type { FunctionComponent } from "react";
 import invariant from "tiny-invariant";
 import type { FileRecord } from "../data";
-import { getFile, updateFile } from "../data";
+import { getFile, updateFile, fileIconMap } from "../data";
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   invariant(params.fileId, "Missing fileId param");
@@ -24,17 +24,21 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
   });
 };
 
+// TODO: Remove contact page, use edit page
 export default function File() {
   const { file: file } = useLoaderData<typeof loader>();
-
   return (
     <div id="contact">
       <div>
-        <img
-          alt={`${file.filename} ${file.token} avatar`}
+        <i
+          // alt={`${file.filename} ${file.token} avatar`}
           key={file.magnet}
-          src={file.magnet}
-        />
+          // src={file.magnet}
+          className={
+            (file ? fileIconMap[file.type] : "fas fa-file-question") +
+            " file-icon"
+          }
+        ></i>
       </div>
 
       <div>

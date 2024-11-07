@@ -8,15 +8,7 @@ import "sweetalert2/dist/sweetalert2.min.css";
 import invariant from "tiny-invariant";
 import toastr from "toastr";
 import "toastr/build/toastr.min.css";
-import { getFile, updateFile } from "../data";
-
-const fileIconMap = {
-  "application/pdf": "fas fa-file-pdf",
-  "application/zip": "fas fa-file-archive",
-  "image/jpeg": "fas fa-file-image",
-  "image/png": "fas fa-file-image",
-  "text/plain": "fas fa-file-alt",
-};
+import { fileIconMap, getFile, updateFile } from "../data";
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   invariant(params.fileId, "Missing fileId param");
@@ -28,10 +20,24 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
 };
 
 export const action = async ({ params, request }: ActionFunctionArgs) => {
+  console.log("Action params:", params);
   invariant(params.fileId, "Missing fileId param");
   const formData = await request.formData();
-  const updates = Object.fromEntries(formData);
-  await updateFile(params.fileId, updates);
+  const formObj = Object.fromEntries(formData);
+  console.log("formObj:", formObj);
+
+  const updates = {
+    filename: formObj.file.name || "",
+    type: formObj.file.type || "",
+    size: formObj.file.size || -1,
+    magnet: formObj.link || "",
+    token: formObj.token || -1,
+    notes: formObj.notes || "",
+  };
+
+  console.log("Updates:", updates);
+
+  const newFile = await updateFile(params.fileId, updates);
   return redirect(`/files/${params.fileId}`);
 };
 
@@ -45,12 +51,6 @@ export default function EditFile() {
   const submit = useSubmit();
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      console.log("Running in the browser. (Client-side/SPA)");
-    } else {
-      console.log("Running on the server. (Node.js/SSR)");
-    }
-
     const loadWebTorrent = async () => {
       // Get URL to conform to Vite's policy
       const webTorrentUrl = new URL(
@@ -58,14 +58,14 @@ export default function EditFile() {
         import.meta.url
       ).toString();
 
-      console.log("Loading WebTorrent from:", webTorrentUrl);
+      // console.log("Loading WebTorrent from:", webTorrentUrl);
 
       // TODO: Load WebTorrent script better
       const script = document.createElement("script");
       script.src = webTorrentUrl;
       script.type = "module";
       script.onload = () => {
-        console.log("WebTorrent loaded");
+        // console.log("WebTorrent loaded");
         setClient(new WebTorrent());
       };
       script.onerror = () => {
@@ -75,7 +75,7 @@ export default function EditFile() {
     };
 
     if (typeof WebTorrent !== "undefined") {
-      console.log("WebTorrent already loaded");
+      // console.log("WebTorrent already loaded");
       setClient(new WebTorrent());
     } else {
       loadWebTorrent();
@@ -84,24 +84,34 @@ export default function EditFile() {
 
   const handleSubmit = (files: FileList | null) => {
     invariant(files, "No file selected");
-    console.log("Submitting files:", files);
-    console.log("Client:", client);
-    console.log("Files:", files);
-    if (client && files) {
-      const file = files[0]; // TODO： Support multiple files
-      client.seed(file, (torrent) => {
-        setTorrent(torrent);
-        console.log("Client is seeding:", torrent.magnetURI);
-        Swal.fire({
-          icon: "success",
-          title: "File uploaded!",
-          text: "Your link is ready for sharing 🎉",
-          showConfirmButton: false,
-          timer: 2500,
-          timerProgressBar: true,
-        });
+    // console.log("Submitting files:", files);
+    // console.log("Client:", client);
+    // console.log("Files:", files);
+    if (!client || !files) {
+      Swal.fire({
+        icon: "error",
+        title: "Client not ready",
+        text: "Please try again later",
+        showConfirmButton: false,
+        timer: 2500,
+        timerProgressBar: true,
       });
+      return;
     }
+
+    const file = files[0]; // TODO： Support multiple files
+    client.seed(file, (torrent) => {
+      setTorrent(torrent);
+      console.log("Client is seeding:", torrent.magnetURI);
+      Swal.fire({
+        icon: "success",
+        title: "File uploaded!",
+        text: "Your link is ready for sharing 🎉",
+        showConfirmButton: false,
+        timer: 2500,
+        timerProgressBar: true,
+      });
+    });
   };
 
   const handleCopy = () => {
@@ -145,9 +155,9 @@ export default function EditFile() {
       >
         <i
           className={
-            file
+            (file
               ? fileIconMap[file.type] || "fas fa-file"
-              : "fas fa-file-upload"
+              : "fas fa-file-upload") + " file-icon"
           }
         ></i>
         {file ? (

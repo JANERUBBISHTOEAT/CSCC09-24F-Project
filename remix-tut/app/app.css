@@ -354,9 +354,12 @@ i {
   color: grey;
   border-color: #ccc;
 }
-#dropzone > i {
-  padding: 0.5rem;
+.file-icon {
+  padding: 1rem;
 }
+/* #dropzone > i {
+  padding: 0.5rem;
+} */
 #contact-form > div:first-of-type input {
   display: none;
 }

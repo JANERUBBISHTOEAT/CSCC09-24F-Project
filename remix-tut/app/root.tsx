@@ -63,7 +63,7 @@ export default function App() {
         {/* ! HTML embed: import no complain, but module not found anywhere (waited) */}
         <div id="sidebar">
           <Link to=".">
-            <h1>Remix Contacts</h1>
+            <h1>Receive Files</h1>
           </Link>
           <div>
             <Form
@@ -105,7 +105,8 @@ export default function App() {
                     >
                       {file.filename || file.token ? (
                         <>
-                          {file.filename} {file.token}
+                          {file.filename} #{file.token}
+                          {/* TODO: Make file.token grey*/}
                         </>
                       ) : (
                         <i>No Name</i>
