@@ -1,9 +1,11 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 import { Form, useLoaderData, useNavigate, useSubmit } from "@remix-run/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import invariant from "tiny-invariant";
 import { getFile, updateFile } from "../data";
+// import WebTorrent from "webtorrent";
+// import WebTorrent from "../../public/webtorrent.min.js";
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   invariant(params.fileId, "Missing fileId param");
@@ -27,33 +29,54 @@ export default function EditFile() {
   const navigate = useNavigate();
 
   const [file, setFile] = useState<File | null>(null);
-  const [dragging, setDragging] = useState(false);
+  const [torrent, setTorrent] = useState<WebTorrent.Torrent | null>(null);
+  const [client, setClient] = useState(null);
   const submit = useSubmit();
 
-  const handleDrop = (event: React.DragEvent) => {
-    event.preventDefault();
-    const droppedFile = event.dataTransfer.files[0];
-    if (droppedFile) {
-      setFile(droppedFile);
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      console.log("Running in the browser. (Client-side/SPA)");
+    } else {
+      console.log("Running on the server. (Node.js/SSR)");
     }
-    setDragging(false);
-  };
+    // if (typeof window !== "undefined") {
+    //   // import("webtorrent")
+    //   import("../../public/webtorrent.min.js")
+    //     .then((WebTorrent) => {
+    //       const client = new WebTorrent();
+    //       setClient(client);
+    //     })
+    //     .catch((error) => {
+    //       console.error("Failed to load WebTorrent:", error);
+    //     });
+    // }
+    console.log("WebTorrent:", window.WebTorrent);
+    if (typeof window !== "undefined" && window.WebTorrent) {
+      const client = new window.WebTorrent();
+      setClient(client);
+    } else {
+      const interval = setInterval(() => {
+        console.log("Checking for WebTorrent...");
+        if (window.WebTorrent) {
+          console.log("WebTorrent loaded:", window.WebTorrent);
+          setClient(client);
+          clearInterval(interval);
+        }
+      }, 100);
+    }
+  });
 
-  const handleDragOver = (event: React.DragEvent) => {
-    event.preventDefault();
-    setDragging(true);
-  };
-
-  const handleDragLeave = () => {
-    setDragging(false);
-  };
-
-  const handleSubmit = (event: React.FormEvent) => {
-    event.preventDefault();
-    if (file) {
-      const formData = new FormData();
-      formData.append("file", file);
-      submit(formData, { method: "post", encType: "multipart/form-data" });
+  const handleSubmit = (files: FileList | null) => {
+    invariant(files, "No file selected");
+    console.log("Submitting files:", files);
+    console.log("Client:", client);
+    console.log("Files:", files);
+    if (client && files) {
+      const file = files[0];
+      client.seed(file, (torrent) => {
+        setTorrent(torrent);
+        console.log("Client is seeding:", torrent.magnetURI);
+      });
     }
   };
 
@@ -89,6 +112,7 @@ export default function EditFile() {
           onChange={(e) => {
             const selectedFile = e.target.files ? e.target.files[0] : null;
             setFile(selectedFile);
+            handleSubmit(e.target.files);
           }}
           id="fileInput"
         />
@@ -128,7 +152,8 @@ export default function EditFile() {
         <input
           aria-label="File Link"
           defaultValue={loadedFile.magnet}
-          name="avatar"
+          name="link"
+          value={torrent?.magnetURI}
           placeholder="magnet:?"
           type="password"
           disabled
