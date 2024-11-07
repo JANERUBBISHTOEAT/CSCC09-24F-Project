@@ -2,6 +2,7 @@ import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 import { Form, useLoaderData, useNavigate, useSubmit } from "@remix-run/react";
 import { useEffect, useState } from "react";
+import Swal from "sweetalert2";
 import invariant from "tiny-invariant";
 import { getFile, updateFile } from "../data";
 
@@ -78,6 +79,28 @@ export default function EditFile() {
         setTorrent(torrent);
         console.log("Client is seeding:", torrent.magnetURI);
       });
+    }
+  };
+
+  const handleCopy = () => {
+    const link = document.querySelector("input[name=link]");
+    if (link instanceof HTMLInputElement) {
+      link.select();
+      navigator.clipboard.writeText(link.value).then(
+        () => {
+          console.log("Text copied to clipboard");
+          // Swal.fire({
+          //   icon: "success",
+          //   title: "Copied to clipboard!",
+          //   showConfirmButton: false,
+          //   timer: 1500,
+          //   timerProgressBar: true,
+          // });
+        },
+        (err) => {
+          console.error("Failed to copy text: ", err);
+        }
+      );
     }
   };
 
@@ -160,6 +183,9 @@ export default function EditFile() {
           // type="password"
           disabled
         />
+        <button type="button" onClick={handleCopy}>
+          Copy
+        </button>
       </label>
       <label>
         <span>Notes</span>

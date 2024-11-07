@@ -370,6 +370,11 @@ i {
 #contact-form label textarea {
   flex-grow: 2;
 }
+#contact-form label button {
+  z-index: 1;
+  margin-left: -2rem;
+  cursor: pointer;
+}
 
 #contact-form-avatar {
   margin-right: 2rem;
