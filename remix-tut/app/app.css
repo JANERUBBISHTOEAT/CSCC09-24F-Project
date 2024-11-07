@@ -335,7 +335,7 @@ i {
   gap: 1rem;
 }
 #contact-form > div:first-of-type {
-  border: 2px dashed #aaa;
+  border: 2px dashed #ccc;
   border-radius: 15px;
   padding: 10px;
   text-align: center;
@@ -346,6 +346,13 @@ i {
   display: flex;
   justify-content: center;
   align-items: center;
+}
+/* #contact-form > div:first-of-type == #dropzone */
+#dropzone > i {
+  padding: 0.5rem;
+}
+#dropzone > div.grey {
+  color: #ccc;
 }
 #contact-form > div:first-of-type input {
   display: none;

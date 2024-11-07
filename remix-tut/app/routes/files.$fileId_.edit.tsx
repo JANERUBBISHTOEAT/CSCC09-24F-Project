@@ -1,3 +1,4 @@
+import "@fortawesome/fontawesome-free/css/all.min.css";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 import { Form, useLoaderData, useNavigate, useSubmit } from "@remix-run/react";
@@ -8,6 +9,14 @@ import invariant from "tiny-invariant";
 import toastr from "toastr";
 import "toastr/build/toastr.min.css";
 import { getFile, updateFile } from "../data";
+
+const fileIconMap = {
+  "application/pdf": "fas fa-file-pdf",
+  "application/zip": "fas fa-file-archive",
+  "image/jpeg": "fas fa-file-image",
+  "image/png": "fas fa-file-image",
+  "text/plain": "fas fa-file-alt",
+};
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   invariant(params.fileId, "Missing fileId param");
@@ -119,6 +128,7 @@ export default function EditFile() {
       encType="multipart/form-data"
     >
       <div
+        id="dropzone"
         // htmlFor="fileInput"
         onDrop={(event) => {
           event.preventDefault();
@@ -131,10 +141,17 @@ export default function EditFile() {
         onDragOver={(event) => event.preventDefault()}
         onClick={() => document.getElementById("fileInput")?.click()}
       >
+        <i
+          className={
+            file
+              ? fileIconMap[file.type] || "fas fa-file"
+              : "fas fa-file-upload"
+          }
+        ></i>
         {file ? (
-          <div>Selected file: {file.name}</div>
+          <div>{file.name}</div>
         ) : (
-          <div>Drag & Drop files here</div>
+          <div className="grey">Drag & Drop files here</div>
         )}
         <input
           type="file"
@@ -153,7 +170,7 @@ export default function EditFile() {
         <span>Name</span>
         <input
           aria-label="Filename"
-          defaultValue={loadedFile.filename}
+          defaultValue={loadedFile.filename || ""}
           name="filename"
           placeholder="Filename"
           type="text"
@@ -161,7 +178,7 @@ export default function EditFile() {
         />
         <input
           aria-label="Token"
-          defaultValue={loadedFile.token}
+          defaultValue={loadedFile.token || ""}
           name="token"
           placeholder="Token"
           type="text"
@@ -171,7 +188,7 @@ export default function EditFile() {
       <label>
         <span>Share with</span>
         <input
-          defaultValue={loadedFile.notes}
+          defaultValue={loadedFile.notes || ""}
           name="notes"
           placeholder="TODO"
           type="text"
@@ -181,7 +198,7 @@ export default function EditFile() {
       <label>
         <span>File Link</span>
         <input
-          defaultValue={loadedFile.magnet}
+          defaultValue={loadedFile.magnet || ""}
           name="link"
           value={torrent?.magnetURI}
           placeholder="magnet:?"
@@ -195,7 +212,7 @@ export default function EditFile() {
       </label>
       <label>
         <span>Notes</span>
-        <textarea defaultValue={loadedFile.notes} name="notes" rows={6} />
+        <textarea defaultValue={loadedFile.notes || ""} name="notes" rows={6} />
       </label>
       <p>
         <button type="submit">Save</button>
