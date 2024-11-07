@@ -66,8 +66,7 @@ export default function EditFile() {
       script.type = "module";
       script.onload = () => {
         console.log("WebTorrent loaded");
-        const client = new WebTorrent();
-        setClient(client);
+        setClient(new WebTorrent());
       };
       script.onerror = () => {
         console.error("WebTorrent failed to load");
@@ -75,10 +74,13 @@ export default function EditFile() {
       document.head.appendChild(script);
     };
 
-    !window.WebTorrent
-      ? loadWebTorrent()
-      : console.log("WebTorrent already loaded");
-  });
+    if (typeof WebTorrent !== "undefined") {
+      console.log("WebTorrent already loaded");
+      setClient(new WebTorrent());
+    } else {
+      loadWebTorrent();
+    }
+  }, []);
 
   const handleSubmit = (files: FileList | null) => {
     invariant(files, "No file selected");
