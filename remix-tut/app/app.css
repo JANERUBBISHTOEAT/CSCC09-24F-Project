@@ -354,10 +354,11 @@ i {
   color: grey;
   border-color: lightgrey;
 }
+#dropzone > .file-icon {
+  color: inherit;
+}
 .file-icon {
   padding: 0.5rem;
-  /* 50% opacity */
-  color: inherit;
 }
 /* #dropzone > i {
   padding: 0.5rem;
