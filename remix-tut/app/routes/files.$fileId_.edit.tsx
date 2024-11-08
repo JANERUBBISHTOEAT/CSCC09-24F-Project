@@ -8,7 +8,7 @@ import "sweetalert2/dist/sweetalert2.min.css";
 import invariant from "tiny-invariant";
 import toastr from "toastr";
 import "toastr/build/toastr.min.css";
-import { fileIconMap, getFile, updateFile } from "../data";
+import { deleteFile, fileIconMap, getFile, updateFile } from "../data";
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   invariant(params.fileId, "Missing fileId param");
@@ -25,6 +25,14 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
   const formData = await request.formData();
   const formObj = Object.fromEntries(formData);
   console.log("formObj:", formObj);
+
+  // No file or link provided, delete this record
+  console.log("formObj.file:", formObj.file);
+  console.log("formObj.link:", formObj.link);
+  if (!formObj.file || !formObj.link) {
+    deleteFile(params.fileId);
+    return redirect("/?message=File+not+saved");
+  }
 
   const updates = {
     filename: formObj.file.name || "",

@@ -1,4 +1,20 @@
+import { useLocation } from "@remix-run/react";
+import { useEffect } from "react";
+import toastr from "toastr";
+import "toastr/build/toastr.min.css";
+
 export default function Index() {
+  const location = useLocation();
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const message = params.get("message");
+    if (message) {
+      toastr.info(message);
+      window.history.replaceState({}, "", location.pathname);
+    }
+  }, [location]);
+
   return (
     <div id="index-page">
       <p>
