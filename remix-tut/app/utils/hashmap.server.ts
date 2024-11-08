@@ -26,7 +26,7 @@ export default class HashMap {
         .digest("hex");
       token = parseInt(hash.slice(0, 6), 16) % 10 ** 6;
 
-      const exists = await this.get(token.toString());
+      const exists = (await this.get(token.toString())) !== str; // Collision
       if (!exists) break;
     }
     if (attempts === maxRetries) {
@@ -53,5 +53,17 @@ export default class HashMap {
 
   static async getKeysCnt(): Promise<number> {
     return await redis.hlen("tokenMap");
+  }
+
+  static async del(token: string): Promise<void> {
+    await redis.hdel("tokenMap", token);
+  }
+
+  static async genToken(magnet: string): Promise<string> {
+    if (!magnet) return "-1";
+    const token_num = await HashMap.genKey(magnet);
+    const token_str = token_num.toString().padStart(6, "0");
+    HashMap.set(token_str, magnet); // TODO: Add expiry
+    return token_str;
   }
 }

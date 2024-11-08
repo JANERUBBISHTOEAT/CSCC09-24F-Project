@@ -46,10 +46,9 @@ const fakeFiles = {
     const createdAt = new Date().toISOString();
     const newFile = { id, createdAt, ...values };
     if (newFile.magnet) {
-      const token_num = await HashMap.genKey(newFile.magnet);
-      const token_str = token_num.toString().padStart(6, "0");
-      HashMap.set(token_str, newFile.magnet);
+      const token_str = await HashMap.genToken(newFile.magnet);
       newFile.token = token_str;
+      console.log("Updated token:", newFile.token);
     }
     fakeFiles.records[id] = newFile;
     return newFile;
@@ -60,9 +59,7 @@ const fakeFiles = {
     invariant(file, `No file found for ${id}`);
     const updatedFile = { ...file, ...values };
     if (updatedFile.magnet) {
-      const token_num = await HashMap.genKey(updatedFile.magnet);
-      const token_str = token_num.toString().padStart(6, "0");
-      HashMap.set(token_str, updatedFile.magnet);
+      const token_str = await HashMap.genToken(updatedFile.magnet);
       updatedFile.token = token_str;
       console.log("Updated token:", updatedFile.token);
     }
