@@ -2,9 +2,9 @@ import type { LinksFunction, LoaderFunctionArgs } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 import {
   Form,
+  Link,
   Links,
   Meta,
-  Link,
   NavLink,
   Outlet,
   Scripts,
@@ -19,6 +19,8 @@ import { createEmptyFile, getFiles } from "./data";
 
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: appStylesHref },
+  { rel: "stylesheet", href: "/css/all.min.css" },
+  { rel: "stylesheet", href: "/css/toastr.min.css" },
 ];
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
