@@ -10,7 +10,7 @@ export default function Index() {
     const params = new URLSearchParams(location.search);
     const message = params.get("message");
     if (message) {
-      toastr.info(message);
+      toastr.warning(message);
       window.history.replaceState({}, "", location.pathname);
     }
   }, [location]);
