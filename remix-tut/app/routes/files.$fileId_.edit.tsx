@@ -8,7 +8,8 @@ import "sweetalert2/dist/sweetalert2.min.css";
 import invariant from "tiny-invariant";
 import toastr from "toastr";
 import "toastr/build/toastr.min.css";
-import { deleteFile, fileIconMap, getFile, updateFile } from "../data";
+import { fileIconMap } from "~/utils/constants";
+import { deleteFile, getFile, updateFile } from "~/utils/data.server";
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   invariant(params.fileId, "Missing fileId param");
@@ -23,6 +24,12 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
 export const action = async ({ params, request }: ActionFunctionArgs) => {
   console.log("Action params:", params);
   invariant(params.fileId, "Missing fileId param");
+  const file = await getFile(params.fileId);
+  if (!file) {
+    redirect("/?message=Page+Not+Found");
+    throw new Response("Not Found", { status: 404 });
+  }
+
   const formData = await request.formData();
   const formObj = Object.fromEntries(formData);
   console.log("formObj:", formObj);
@@ -34,12 +41,12 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
   }
 
   const updates = {
-    filename: formObj.file.name || "",
-    type: formObj.file.type || "",
-    size: formObj.file.size || -1,
-    magnet: formObj.link || "",
-    token: formObj.token || -1,
-    notes: formObj.notes || "",
+    filename: formObj.file.name || file.filename || "",
+    type: formObj.file.type || file.type || "",
+    size: formObj.file.size || file.size || -1,
+    magnet: formObj.link || file.magnet || "",
+    token: formObj.token || file.token || -1,
+    notes: formObj.notes || file.notes || "",
   };
 
   console.log("Updates:", updates);

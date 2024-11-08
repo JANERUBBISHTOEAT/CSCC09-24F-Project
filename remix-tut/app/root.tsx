@@ -14,8 +14,8 @@ import {
   useSubmit,
 } from "@remix-run/react";
 import { useEffect } from "react";
+import { createEmptyFile, getFiles } from "~/utils/data.server";
 import appStylesHref from "./app.css?url";
-import { createEmptyFile, getFiles } from "./data";
 
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: appStylesHref },

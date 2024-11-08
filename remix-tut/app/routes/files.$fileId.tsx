@@ -7,8 +7,9 @@ import { useEffect } from "react";
 import invariant from "tiny-invariant";
 import toastr from "toastr";
 import "toastr/build/toastr.min.css";
-import type { FileRecord } from "../data";
-import { fileIconMap, getFile, updateFile } from "../data";
+import { fileIconMap } from "~/utils/constants";
+import type { FileRecord } from "~/utils/data.server";
+import { getFile, updateFile } from "~/utils/data.server";
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   invariant(params.fileId, "Missing fileId param");
