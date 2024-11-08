@@ -49,7 +49,6 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
 
 export default function EditFile() {
   const { file: loadedFile } = useLoaderData<typeof loader>();
-  console.log("Loaded file:", loadedFile);
   const navigate = useNavigate();
 
   const [file, setFile] = useState<File | null>(null);
@@ -229,6 +228,7 @@ export default function EditFile() {
           type="text"
           name="link"
           value={loadedFile.magnet || torrent?.magnetURI || ""}
+          readOnly
         />
         <button type="button" onClick={handleCopy}>
           Copy
