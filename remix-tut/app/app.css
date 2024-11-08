@@ -360,9 +360,11 @@ i {
 .file-icon {
   padding: 0.5rem;
 }
-/* #dropzone > i {
-  padding: 0.5rem;
-} */
+
+#contact-form input.hidden {
+  display: none;
+}
+
 #contact-form > div:first-of-type input {
   display: none;
 }

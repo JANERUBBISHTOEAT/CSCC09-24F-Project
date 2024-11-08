@@ -6,6 +6,10 @@ import type { FunctionComponent } from "react";
 import invariant from "tiny-invariant";
 import type { FileRecord } from "../data";
 import { getFile, updateFile, fileIconMap } from "../data";
+import { useLocation } from "@remix-run/react";
+import { useEffect } from "react";
+import toastr from "toastr";
+import "toastr/build/toastr.min.css";
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   invariant(params.fileId, "Missing fileId param");
@@ -26,6 +30,17 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
 
 // TODO: Remove contact page, use edit page
 export default function File() {
+  const location = useLocation();
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const message = params.get("message");
+    if (message) {
+      toastr.success(message);
+      window.history.replaceState({}, "", location.pathname);
+    }
+  }, [location]);
+
   const { file: file } = useLoaderData<typeof loader>();
   return (
     <div id="contact">

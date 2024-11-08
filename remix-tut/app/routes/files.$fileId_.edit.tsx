@@ -27,8 +27,6 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
   console.log("formObj:", formObj);
 
   // No file or link provided, delete this record
-  console.log("formObj.file:", formObj.file);
-  console.log("formObj.link:", formObj.link);
   if (!formObj.file || !formObj.link) {
     deleteFile(params.fileId);
     return redirect("/?message=File+not+saved");
@@ -46,11 +44,12 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
   console.log("Updates:", updates);
 
   const newFile = await updateFile(params.fileId, updates);
-  return redirect(`/files/${params.fileId}`);
+  return redirect(`/files/${params.fileId}/?message=File+saved`);
 };
 
 export default function EditFile() {
   const { file: loadedFile } = useLoaderData<typeof loader>();
+  console.log("Loaded file:", loadedFile);
   const navigate = useNavigate();
 
   const [file, setFile] = useState<File | null>(null);
@@ -191,8 +190,7 @@ export default function EditFile() {
         <input
           aria-label="Filename"
           name="filename"
-          defaultValue={loadedFile.filename || ""}
-          value={file?.name}
+          defaultValue={loadedFile.filename || file?.name || ""}
           placeholder="Filename"
           type="text"
           disabled
@@ -219,13 +217,18 @@ export default function EditFile() {
       <label>
         <span>File Link</span>
         <input
-          name="link"
-          defaultValue={loadedFile.magnet || ""}
-          value={torrent?.magnetURI}
+          name="_link"
+          defaultValue={loadedFile.magnet || torrent?.magnetURI || ""}
           placeholder="magnet:?"
           type="text"
           // type="password"
           disabled
+        />
+        <input
+          className="hidden"
+          type="text"
+          name="link"
+          value={loadedFile.magnet || torrent?.magnetURI || ""}
         />
         <button type="button" onClick={handleCopy}>
           Copy
