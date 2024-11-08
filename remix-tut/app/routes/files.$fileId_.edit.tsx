@@ -174,11 +174,20 @@ export default function EditFile() {
     }
   }, [fetcher.data]);
 
-  const handleCopy = () => {
-    const link = document.querySelector("input[name=link]");
-    if (link instanceof HTMLInputElement) {
-      link.select();
-      navigator.clipboard.writeText(link.value).then(
+  const handleCopy = (event: React.MouseEvent<HTMLButtonElement>) => {
+    let text: HTMLInputElement | null = null;
+    if (event.currentTarget.id === "copy-magnet") {
+      text = document.querySelector("input[name=magnet]");
+    } else if (event.currentTarget.id === "copy-token") {
+      text = document.querySelector("input[name=token]");
+    } else {
+      console.error("Unknown copy target");
+      return;
+    }
+
+    if (text instanceof HTMLInputElement) {
+      // text.select();
+      navigator.clipboard.writeText(text.value).then(
         () => {
           console.log("Text copied to clipboard");
           toastr.success("Copied to clipboard");
@@ -255,7 +264,7 @@ export default function EditFile() {
           type="text"
           disabled
         />
-        <button type="button" onClick={handleCopy}>
+        <button id="copy-token" type="button" onClick={handleCopy}>
           Copy
         </button>
       </p>
@@ -286,7 +295,7 @@ export default function EditFile() {
           value={dbFileJson.magnet || torrent?.magnetURI || ""}
           readOnly
         />
-        <button type="button" onClick={handleCopy}>
+        <button id="copy-magnet" type="button" onClick={handleCopy}>
           Copy
         </button>
       </label>
