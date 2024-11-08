@@ -352,10 +352,12 @@ i {
 }
 #dropzone:hover {
   color: grey;
-  border-color: #ccc;
+  border-color: lightgrey;
 }
 .file-icon {
-  padding: 1rem;
+  padding: 0.5rem;
+  /* 50% opacity */
+  color: inherit;
 }
 /* #dropzone > i {
   padding: 0.5rem;

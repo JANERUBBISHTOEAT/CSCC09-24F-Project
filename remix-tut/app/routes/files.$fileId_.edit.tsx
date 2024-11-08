@@ -157,7 +157,7 @@ export default function EditFile() {
           className={
             (file
               ? fileIconMap[file.type] || "fas fa-file"
-              : "fas fa-file-upload") + " file-icon"
+              : "fas fa-file-upload") + " fa-2x file-icon"
           }
         ></i>
         {file ? (

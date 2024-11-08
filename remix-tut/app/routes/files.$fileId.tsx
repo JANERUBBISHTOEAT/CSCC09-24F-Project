@@ -36,7 +36,7 @@ export default function File() {
           // src={file.magnet}
           className={
             (file ? fileIconMap[file.type] : "fas fa-file-question") +
-            " file-icon"
+            " fa-2x file-icon"
           }
         ></i>
       </div>

@@ -26,6 +26,7 @@ export type FileRecord = FileMutation & {
 export const fileIconMap = {
   "application/pdf": "fas fa-file-pdf",
   "application/zip": "fas fa-file-archive",
+  "video/mp4": "fas fa-file-video",
   "image/jpeg": "fas fa-file-image",
   "image/png": "fas fa-file-image",
   "text/plain": "fas fa-file-alt",
@@ -114,8 +115,8 @@ export async function deleteFile(id: string) {
   },
   {
     magnet: "magnet:?xt=...",
-    filename: "file.txt",
-    type: "text/plain",
+    filename: "file.mp4",
+    type: "video/mp4",
     token: 200200,
     notes: "",
   },
