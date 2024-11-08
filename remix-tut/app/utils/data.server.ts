@@ -37,6 +37,7 @@ const fakeFiles = {
   },
 
   async get(id: string): Promise<FileRecord | null> {
+    // TODO: Use redis.get
     return fakeFiles.records[id] || null;
   },
 
