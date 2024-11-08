@@ -20,10 +20,7 @@ export default class HashMap {
     let hash: string;
 
     while (attempts++ < maxRetries) {
-      hash = this.crypto
-        .createHash("md5")
-        .update(str + Math.random())
-        .digest("hex");
+      hash = this.crypto.createHash("md5").update(str).digest("hex");
       token = parseInt(hash.slice(0, 6), 16) % 10 ** 6;
 
       const exists = (await this.get(token.toString())) !== str; // Collision
@@ -43,24 +40,28 @@ export default class HashMap {
     magnet: string,
     expiry: number = 60 * 60
   ): Promise<void> {
+    if (!redis) return;
     await redis.hset("tokenMap", token, magnet);
     await redis.expire("tokenMap", expiry);
   }
 
   static async get(token: string): Promise<string | null> {
+    if (!redis) return;
     return await redis.hget("tokenMap", token);
   }
 
   static async getKeysCnt(): Promise<number> {
+    if (!redis) return;
     return await redis.hlen("tokenMap");
   }
 
   static async del(token: string): Promise<void> {
+    if (!redis) return;
     await redis.hdel("tokenMap", token);
   }
 
   static async genToken(magnet: string): Promise<string> {
-    if (!magnet) return "-1";
+    if (!redis || !magnet) return "";
     const token_num = await HashMap.genKey(magnet);
     const token_str = token_num.toString().padStart(6, "0");
     HashMap.set(token_str, magnet); // TODO: Add expiry

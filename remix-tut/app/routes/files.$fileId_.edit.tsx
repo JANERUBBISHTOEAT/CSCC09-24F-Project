@@ -21,6 +21,7 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
   return json({ file: file });
 };
 
+// TODO: Deprecate this action when `handleSubmit` is ready
 export const action = async ({ params, request }: ActionFunctionArgs) => {
   console.log("Action params:", params);
   invariant(params.fileId, "Missing fileId param");
@@ -35,31 +36,34 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
   console.log("formObj:", formObj);
 
   // No file or link provided, delete this record
-  if (!formObj.file || !formObj.link) {
+  if (!formObj.file || !formObj.magnet) {
     deleteFile(params.fileId);
     return redirect("/?message=File+not+saved");
   }
 
   const updates = {
-    filename: formObj.file.name || file.filename || "",
-    type: formObj.file.type || file.type || "",
-    size: formObj.file.size || file.size || -1,
-    magnet: formObj.link || file.magnet || "",
-    token: formObj.token || file.token || -1,
-    notes: formObj.notes || file.notes || "",
+    filename:
+      (formObj.file as File).name || file.filename || params.fileId || "",
+    type: (formObj.file as File).type || file.type || "",
+    size: (formObj.file as File).size || file.size || -1,
+    magnet: (formObj.magnet as string) || file.magnet || "",
+    token: (formObj.token as string) || file.token || "",
+    notes: (formObj.notes as string) || file.notes || "",
   };
 
   console.log("Updates:", updates);
 
   const newFile = await updateFile(params.fileId, updates);
+  // TODO: Update token element
   return redirect(`/files/${params.fileId}/?message=File+saved`);
 };
 
 export default function EditFile() {
-  const { file: loadedFile } = useLoaderData<typeof loader>();
+  const { file: dbFileJson } = useLoaderData<typeof loader>();
   const navigate = useNavigate();
 
-  const [file, setFile] = useState<File | null>(null);
+  const [file, setFile] = useState<File | null>(null); // TODO: Check if this was unused
+  const [token, setToken] = useState<string | null>(null);
   const [torrent, setTorrent] = useState<WebTorrent.Torrent | null>(null);
   const [client, setClient] = useState(null);
   const submit = useSubmit();
@@ -113,8 +117,8 @@ export default function EditFile() {
       return;
     }
 
-    const file = files[0]; // TODO： Support multiple files
-    client.seed(file, (torrent) => {
+    const selectedFile = files[0]; // TODO： Support multiple files (or not?)
+    client.seed(selectedFile, async (torrent) => {
       setTorrent(torrent);
       console.log("Client is seeding:", torrent.magnetURI);
       Swal.fire({
@@ -125,6 +129,11 @@ export default function EditFile() {
         timer: 2500,
         timerProgressBar: true,
       });
+
+      // ? auto submit form or not
+      // TODO: Make a usability test
+      // const form = document.getElementById("contact-form");
+      // if (form instanceof HTMLFormElement) form.submit();
     });
   };
 
@@ -148,7 +157,7 @@ export default function EditFile() {
   return (
     // File drop zone
     <Form
-      key={loadedFile.id}
+      key={dbFileJson.id}
       id="contact-form"
       method="post"
       encType="multipart/form-data"
@@ -197,15 +206,14 @@ export default function EditFile() {
         <input
           aria-label="Filename"
           name="filename"
-          defaultValue={loadedFile.filename || file?.name || ""}
+          defaultValue={dbFileJson.filename || file?.name || ""}
           placeholder="Filename"
           type="text"
-          disabled
         />
         <input
           aria-label="Token"
           name="token"
-          defaultValue={loadedFile.token || ""}
+          defaultValue={dbFileJson.token || token || ""}
           placeholder="Token"
           type="text"
           disabled
@@ -214,7 +222,7 @@ export default function EditFile() {
       <label>
         <span>Share with</span>
         <input
-          defaultValue={loadedFile.notes || ""}
+          defaultValue={dbFileJson.notes || ""}
           name="notes"
           placeholder="TODO"
           type="text"
@@ -224,8 +232,8 @@ export default function EditFile() {
       <label>
         <span>File Link</span>
         <input
-          name="_link"
-          defaultValue={loadedFile.magnet || torrent?.magnetURI || ""}
+          name="_magnet"
+          defaultValue={dbFileJson.magnet || torrent?.magnetURI || ""}
           placeholder="magnet:?"
           type="text"
           // type="password"
@@ -234,8 +242,8 @@ export default function EditFile() {
         <input
           className="hidden"
           type="text"
-          name="link"
-          value={loadedFile.magnet || torrent?.magnetURI || ""}
+          name="magnet"
+          value={dbFileJson.magnet || torrent?.magnetURI || ""}
           readOnly
         />
         <button type="button" onClick={handleCopy}>
@@ -244,7 +252,7 @@ export default function EditFile() {
       </label>
       <label>
         <span>Notes</span>
-        <textarea defaultValue={loadedFile.notes || ""} name="notes" rows={6} />
+        <textarea defaultValue={dbFileJson.notes || ""} name="notes" rows={6} />
       </label>
       <p>
         <button type="submit">Save</button>

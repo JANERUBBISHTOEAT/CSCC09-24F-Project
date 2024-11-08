@@ -107,7 +107,7 @@ export default function App() {
                     >
                       {file.filename || file.token ? (
                         <>
-                          {file.filename} #{file.token}
+                          {file.filename} #{file.token ? file.token : "------"}
                           {/* TODO: Make file.token grey*/}
                         </>
                       ) : (

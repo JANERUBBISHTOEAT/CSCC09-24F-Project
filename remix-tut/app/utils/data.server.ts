@@ -110,21 +110,21 @@ export async function deleteFile(id: string) {
 
 [
   {
-    magnet: "magnet:?xt=...",
+    magnet: "magnet:?xt=1",
     filename: "file.pdf",
     type: "application/pdf",
     token: "100100",
     notes: "Hello world",
   },
   {
-    magnet: "magnet:?xt=...",
+    magnet: "magnet:?xt=2",
     filename: "file.mp4",
     type: "video/mp4",
     token: "200200",
     notes: "",
   },
   {
-    magnet: "magnet:?xt=...",
+    magnet: "magnet:?xt=3",
     filename: "file.zip",
     type: "application/zip",
     token: "300300",
