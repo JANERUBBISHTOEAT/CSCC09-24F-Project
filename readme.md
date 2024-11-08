@@ -22,11 +22,11 @@ The beta version of application will incorporate following features (in order of
 
 #### File Transfer
 
-- An improved WebUI for file upload and download, allowing users to upload files and receive a unique access link.
-- Users can upload files and receive a unique link for access.
-- Users may download files by entering the unique link.
-- File integrity is ensured by performing a hash check before and after transfer.
-- Face-to-face file sharing by scanning QR codes or other methods.
+- [ ] An improved WebUI for file upload and download, allowing users to upload files and receive a unique access link.
+- [ ] Users can upload files and receive a unique link for access.
+- [ ] Users may download files by entering the unique link.
+- [ ] File integrity is ensured by performing a hash check before and after transfer.
+- [ ] Face-to-face file sharing by scanning QR codes or other methods.
 
 ### Additional Features / Final Version
 
@@ -34,12 +34,13 @@ The final version of the application will incorporate the following additional f
 
 #### File Transfer
 
-- Large files are split into chunks to accommodate browser memory constraints.
-- Reassembling file chunks seamlessly on the recipient's end.
-- Receivers can download the file before fully uploaded: streaming / chunking.
-- Establish multiple P2P links to expedite download speed.*
-- Distributing chunks to multiple users to enhance download speed.*
-- Senders may close the browser and the file will still be available to download: advanced seeding.*
+- [ ] Users account keep records of files uploaded and downloaded.
+- [ ] Large files are split into chunks to accommodate browser memory constraints.
+- [ ] Reassembling file chunks seamlessly on the recipient's end.
+- [ ] Receivers can download the file before fully uploaded: streaming / chunking.
+- [ ] Establish multiple P2P links to expedite download speed.*
+- [ ] Distributing chunks to multiple users to enhance download speed.*
+- [ ] Senders may close the browser and the file will still be available to download: advanced seeding.*
 
 #### Security
 
