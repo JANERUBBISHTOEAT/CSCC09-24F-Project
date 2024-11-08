@@ -131,3 +131,4 @@ dist
 
 frontend/static/*.min.js
 *.pdf
+remix-tut/public/webtorrent.min.js

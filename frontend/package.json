@@ -4,9 +4,9 @@
   "description": "$\\quad$ Abstract $-$ TODO",
   "main": "app.mjs",
   "scripts": {
-    "prod": "node app.mjs",
-    "dev": "nodemon app.mjs",
-    "test": "npx mocha"
+    "prod-demo": "node app.mjs",
+    "dev-demo": "nodemon app.mjs",
+    "test-demo": "npx mocha"
   },
   "author": "",
   "license": "ISC",

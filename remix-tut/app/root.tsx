@@ -2,6 +2,7 @@ import type { LinksFunction, LoaderFunctionArgs } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 import {
   Form,
+  Link,
   Links,
   Meta,
   NavLink,
@@ -14,26 +15,28 @@ import {
 } from "@remix-run/react";
 import { useEffect } from "react";
 import appStylesHref from "./app.css?url";
-import { createEmptyContact, getContacts } from "./data";
+import { createEmptyFile, getFiles } from "./data";
 
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: appStylesHref },
+  { rel: "stylesheet", href: "/css/all.min.css" },
+  { rel: "stylesheet", href: "/css/toastr.min.css" },
 ];
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const url = new URL(request.url);
   const q = url.searchParams.get("q");
-  const contacts = await getContacts(q);
-  return json({ contacts, q });
+  const files = await getFiles(q);
+  return json({ files: files, q });
 };
 
 export const action = async () => {
-  const contact = await createEmptyContact();
-  return redirect(`/contacts/${contact.id}/edit`);
+  const file = await createEmptyFile();
+  return redirect(`/files/${file.id}/edit`);
 };
 
 export default function App() {
-  const { contacts, q } = useLoaderData<typeof loader>();
+  const { files: files, q } = useLoaderData<typeof loader>();
   const navigation = useNavigation();
   const submit = useSubmit();
   const searching =
@@ -56,8 +59,14 @@ export default function App() {
         <Links />
       </head>
       <body>
+        {/* <script type="module">
+          import WebTorrent from 'webtorrent.min.js'
+        </script> */}
+        {/* ! HTML embed: import no complain, but module not found anywhere (waited) */}
         <div id="sidebar">
-          <h1>Remix Contacts</h1>
+          <Link to=".">
+            <h1>Receive Files</h1>
+          </Link>
           <div>
             <Form
               id="search-form"
@@ -73,7 +82,7 @@ export default function App() {
                 id="q"
                 className={searching ? "loading" : ""}
                 defaultValue={q || ""}
-                aria-label="Search contacts"
+                aria-label="Search files"
                 placeholder="Search"
                 type="search"
                 name="q"
@@ -85,32 +94,33 @@ export default function App() {
             </Form>
           </div>
           <nav>
-            {contacts.length ? (
+            {files.length ? (
               <ul>
-                {contacts.map((contact) => (
-                  <li key={contact.id}>
+                {files.map((file) => (
+                  <li key={file.id}>
                     {" "}
                     <NavLink
                       className={({ isActive, isPending }) =>
                         isActive ? "active" : isPending ? "pending" : ""
                       }
-                      to={`contacts/${contact.id}`}
+                      to={`files/${file.id}`}
                     >
-                      {contact.first || contact.last ? (
+                      {file.filename || file.token ? (
                         <>
-                          {contact.first} {contact.last}
+                          {file.filename} #{file.token}
+                          {/* TODO: Make file.token grey*/}
                         </>
                       ) : (
                         <i>No Name</i>
                       )}{" "}
-                      {contact.favorite ? <span>★</span> : null}
+                      {file.favorite ? <span>★</span> : null}
                     </NavLink>
                   </li>
                 ))}
               </ul>
             ) : (
               <p>
-                <i>No contacts</i>
+                <i>No files</i>
               </p>
             )}
           </nav>
