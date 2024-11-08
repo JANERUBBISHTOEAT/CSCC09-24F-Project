@@ -1,7 +1,13 @@
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
-import { Form, useLoaderData, useNavigate, useSubmit } from "@remix-run/react";
+import {
+  Form,
+  useLoaderData,
+  useNavigate,
+  useSubmit,
+  useFetcher,
+} from "@remix-run/react";
 import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import "sweetalert2/dist/sweetalert2.min.css";
@@ -10,6 +16,7 @@ import toastr from "toastr";
 import "toastr/build/toastr.min.css";
 import { fileIconMap } from "~/utils/constants";
 import { deleteFile, getFile, updateFile } from "~/utils/data.server";
+import HashMap from "~/utils/hashmap.server";
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   invariant(params.fileId, "Missing fileId param");
@@ -25,15 +32,32 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
 export const action = async ({ params, request }: ActionFunctionArgs) => {
   console.log("Action params:", params);
   invariant(params.fileId, "Missing fileId param");
+
+  // Check intent
+  const formData = await request.formData();
+  const formObj = Object.fromEntries(formData);
+  console.log("formObj:", formObj);
+
+  // * Is torrent callback
+  if (formObj.intent === "acquireToken") {
+    // No magnet provided, return
+    if (!formObj.magnet) {
+      return json({ token: "" });
+    }
+
+    // Generate & save token
+    const token = await HashMap.genToken(formObj.magnet);
+    console.log("Token:", token);
+
+    return json({ token: token });
+  }
+
+  // * Is human clicking button
   const file = await getFile(params.fileId);
   if (!file) {
     redirect("/?message=Page+Not+Found");
     throw new Response("Not Found", { status: 404 });
   }
-
-  const formData = await request.formData();
-  const formObj = Object.fromEntries(formData);
-  console.log("formObj:", formObj);
 
   // No file or link provided, delete this record
   if (!formObj.file || !formObj.magnet) {
@@ -66,7 +90,7 @@ export default function EditFile() {
   const [token, setToken] = useState<string | null>(null);
   const [torrent, setTorrent] = useState<WebTorrent.Torrent | null>(null);
   const [client, setClient] = useState(null);
-  const submit = useSubmit();
+  const fetcher = useFetcher();
 
   useEffect(() => {
     const loadWebTorrent = async () => {
@@ -121,6 +145,19 @@ export default function EditFile() {
     client.seed(selectedFile, async (torrent) => {
       setTorrent(torrent);
       console.log("Client is seeding:", torrent.magnetURI);
+
+      // [ ] Call action with intend to acquire token
+      const formData = new FormData();
+      formData.append("intent", "acquireToken");
+      formData.append("magnet", torrent.magnetURI);
+      for (let [key, value] of formData.entries()) {
+        console.log(`${key}: ${value}`);
+      }
+      fetcher.submit(formData, {
+        method: "POST",
+        action: ".",
+      });
+
       Swal.fire({
         icon: "success",
         title: "File uploaded!",
@@ -129,13 +166,16 @@ export default function EditFile() {
         timer: 2500,
         timerProgressBar: true,
       });
-
-      // ? auto submit form or not
-      // TODO: Make a usability test
-      // const form = document.getElementById("contact-form");
-      // if (form instanceof HTMLFormElement) form.submit();
     });
   };
+
+  useEffect(() => {
+    if (fetcher.data) {
+      console.log("Response data:", fetcher.data);
+      const receivedToken = fetcher.data.token || "";
+      setToken(receivedToken);
+    }
+  }, [fetcher.data]);
 
   const handleCopy = () => {
     const link = document.querySelector("input[name=link]");
