@@ -1,20 +1,20 @@
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import { json } from "@remix-run/node";
-import { Form, useFetcher, useLoaderData } from "@remix-run/react";
+import { json, redirect } from "@remix-run/node";
+import { Form, useFetcher, useLoaderData, useLocation } from "@remix-run/react";
 import type { FunctionComponent } from "react";
-import invariant from "tiny-invariant";
-import type { FileRecord } from "../data";
-import { getFile, updateFile, fileIconMap } from "../data";
-import { useLocation } from "@remix-run/react";
 import { useEffect } from "react";
+import invariant from "tiny-invariant";
 import toastr from "toastr";
 import "toastr/build/toastr.min.css";
+import type { FileRecord } from "../data";
+import { fileIconMap, getFile, updateFile } from "../data";
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   invariant(params.fileId, "Missing fileId param");
   const file = await getFile(params.fileId);
   if (!file) {
+    redirect("/?message=Page+Not+Found");
     throw new Response("Not Found", { status: 404 });
   }
   return json({ file: file });
