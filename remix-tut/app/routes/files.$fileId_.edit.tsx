@@ -150,9 +150,6 @@ export default function EditFile() {
       const formData = new FormData();
       formData.append("intent", "acquireToken");
       formData.append("magnet", torrent.magnetURI);
-      for (let [key, value] of formData.entries()) {
-        console.log(`${key}: ${value}`);
-      }
       fetcher.submit(formData, {
         method: "POST",
         action: ".",
@@ -258,6 +255,9 @@ export default function EditFile() {
           type="text"
           disabled
         />
+        <button type="button" onClick={handleCopy}>
+          Copy
+        </button>
       </p>
       <label>
         <span>Share with</span>
