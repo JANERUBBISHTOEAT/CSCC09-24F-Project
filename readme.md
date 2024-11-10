@@ -22,10 +22,10 @@ The beta version of application will incorporate following features (in order of
 
 #### File Transfer
 
-- [ ] An improved WebUI for file upload and download, allowing users to upload files and receive a unique access link.
-- [ ] Users can upload files and receive a unique link for access.
+- [x] An improved WebUI for file upload and download, allowing users to upload files and receive a unique access link.
+- [x] Users can upload files and receive a unique link for access.
 - [ ] Users may download files by entering the unique link.
-- [ ] File integrity is ensured by performing a hash check before and after transfer.
+- [x] File integrity is ensured by performing a hash check before and after transfer.
 - [ ] Face-to-face file sharing by scanning QR codes or other methods.
 
 ### Additional Features / Final Version
@@ -44,11 +44,12 @@ The final version of the application will incorporate the following additional f
 
 #### Security
 
-- Files are encrypted by senders prior to upload, generating a unique decryption key.
-- Receivers use this key to decrypt the file upon download.
-- Embed keys directly within `magnet` links and `.Torrent` files for secure sharing.
-- OAuth, MFA, local authentication are integrated on demand for enhanced security measures.
-- Time-based one-time password (TOTP) for key exchange.*
+- [ ] Add accounts
+- [ ] OAuth, MFA, local authentication are integrated on demand for enhanced security measures.
+- [ ] Files are encrypted by senders prior to upload, generating a unique decryption key.
+- [ ] Receivers use this key to decrypt the file upon download.
+- [ ] Embed keys directly within `magnet` links and `.Torrent` files for secure sharing.
+- [ ] Time-based one-time password (TOTP) for key exchange.*
 
 > Features marked with an asterisk (*) require proof of concept to verify feasibility and may be subject to change.
 > Within the scope of the course, [WebToWeb](#introduction) will prioritize core features, with additional implementations as time allows.
@@ -57,8 +58,7 @@ The final version of the application will incorporate the following additional f
 
 ### Design Overview
 
-![System_Design](./System_Design.svg)
->
+![System_Design](./Structure-v2.drawio.svg)
 
 ### Frontend
 
