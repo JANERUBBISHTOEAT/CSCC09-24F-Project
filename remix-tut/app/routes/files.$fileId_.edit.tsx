@@ -1,14 +1,8 @@
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
-import {
-  Form,
-  useLoaderData,
-  useNavigate,
-  useSubmit,
-  useFetcher,
-} from "@remix-run/react";
-import { useEffect, useState } from "react";
+import { Form, useFetcher, useLoaderData, useNavigate } from "@remix-run/react";
+import { useEffect, useRef, useState } from "react";
 import Swal from "sweetalert2";
 import "sweetalert2/dist/sweetalert2.min.css";
 import invariant from "tiny-invariant";
@@ -105,50 +99,28 @@ export default function EditFile() {
 
   const [file, setFile] = useState<File | null>(null); // TODO: Check if this was unused
   const [token, setToken] = useState<string | null>(null);
-  const [torrent, setTorrent] = useState<WebTorrent.Torrent | null>(null);
-  const [client, setClient] = useState(null);
+  const [torrent, setTorrent] = useState<any | null>(null);
   const fetcher = useFetcher();
 
-  useEffect(() => {
-    // TODO: Adopt a better way to load WebTorrent
-    // ? 1. use the same way as hashmap.server.ts::crypto
-    // ? 2. import normally, and config in tsconfig.json
-    const loadWebTorrent = async () => {
-      // Get URL to conform to Vite's policy
-      const webTorrentUrl = new URL(
-        "/webtorrent.min.js",
-        import.meta.url
-      ).toString();
+  const clientRef = useRef<any | null>(null);
 
-      // console.log("Loading WebTorrent from:", webTorrentUrl);
-
-      const script = document.createElement("script");
-      script.src = webTorrentUrl;
-      script.type = "module";
-      script.onload = () => {
-        // console.log("WebTorrent loaded");
-        setClient(new WebTorrent());
-      };
-      script.onerror = () => {
-        console.error("WebTorrent failed to load");
-      };
-      document.head.appendChild(script);
-    };
-
-    if (typeof WebTorrent !== "undefined") {
-      // console.log("WebTorrent already loaded");
-      setClient(new WebTorrent());
-    } else {
-      loadWebTorrent();
+  async function loadModule() {
+    console.log("Loading WebTorrent module");
+    if (typeof window !== "undefined" && !clientRef.current) {
+      import("webtorrent").then((WebTorrent) => {
+        clientRef.current = new WebTorrent.default();
+        console.log("WebTorrent client ready", clientRef.current);
+      });
     }
+  }
+
+  useEffect(() => {
+    loadModule();
   }, []);
 
   const handleSubmit = (files: FileList | null) => {
     invariant(files, "No file selected");
-    // console.log("Submitting files:", files);
-    // console.log("Client:", client);
-    // console.log("Files:", files);
-    if (!client || !files) {
+    if (!clientRef.current || !files) {
       Swal.fire({
         icon: "error",
         title: "Client not ready",
@@ -157,12 +129,14 @@ export default function EditFile() {
         timer: 2500,
         timerProgressBar: true,
       });
+      console.error("Client not ready", clientRef.current);
+      loadModule();
       return;
     }
 
     // Seed the file
     const selectedFile = files[0];
-    client.seed(selectedFile, async (torrent) => {
+    clientRef.current.seed(selectedFile, async (torrent) => {
       clearTimeout(timeoutId);
       setTorrent(torrent);
       console.log("Client is seeding:", torrent.magnetURI);
