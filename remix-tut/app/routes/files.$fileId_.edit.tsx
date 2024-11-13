@@ -141,7 +141,11 @@ export default function EditFile() {
       return;
     }
 
-    const selectedFile = files[0]; // TODO： Support multiple files (or not?)
+    // Prompt user that file is being seeded
+    toastr.info("Seeding file...");
+
+    // Seed the file
+    const selectedFile = files[0];
     client.seed(selectedFile, async (torrent) => {
       setTorrent(torrent);
       console.log("Client is seeding:", torrent.magnetURI);
@@ -157,7 +161,7 @@ export default function EditFile() {
 
       Swal.fire({
         icon: "success",
-        title: "File uploaded!",
+        title: "File seeded!",
         text: "Your link is ready for sharing 🎉",
         showConfirmButton: false,
         timer: 2500,

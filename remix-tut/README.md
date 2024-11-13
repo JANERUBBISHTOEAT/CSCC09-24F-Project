@@ -1,4 +1,4 @@
-# Welcome to Remix!
+# Welcome to Remix
 
 - [Remix Docs](https://remix.run/docs)
 
@@ -7,6 +7,7 @@
 From your terminal:
 
 ```sh
+redis-server .\app\redis.windows.conf
 npm run dev
 ```
 
