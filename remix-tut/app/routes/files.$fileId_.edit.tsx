@@ -160,12 +160,10 @@ export default function EditFile() {
       return;
     }
 
-    // Prompt user that file is being seeded
-    toastr.info("Seeding file...");
-
     // Seed the file
     const selectedFile = files[0];
     client.seed(selectedFile, async (torrent) => {
+      clearTimeout(timeoutId);
       setTorrent(torrent);
       console.log("Client is seeding:", torrent.magnetURI);
 
@@ -187,6 +185,12 @@ export default function EditFile() {
         timerProgressBar: true,
       });
     });
+
+    const timeoutId = setTimeout(() => {
+      // Prompt user that file is being seeded
+      console.log("Seeding in progress, please wait...");
+      toastr.info("Seeding in progress, please wait...");
+    }, 1000);
   };
 
   useEffect(() => {
