@@ -1,6 +1,6 @@
 import Redis from "ioredis";
 
-const redis = new Redis({ port: 8080 });
+const redis = new Redis();
 
 export default class HashMap {
   map: Map<number, string>;
