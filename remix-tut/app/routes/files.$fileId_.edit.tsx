@@ -28,7 +28,6 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
   return json({ file: file });
 };
 
-// TODO: Deprecate this action when `handleSubmit` is ready
 export const action = async ({ params, request }: ActionFunctionArgs) => {
   console.log("Action params:", params);
   invariant(params.fileId, "Missing fileId param");
@@ -40,6 +39,7 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
 
   // * Is torrent callback
   if (formObj.intent === "acquireToken") {
+    console.log("intent: acquireToken");
     // No magnet provided, return
     if (!formObj.magnet) {
       return json({ token: "" });
@@ -52,12 +52,29 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
     return json({ token: token });
   }
 
-  // * Is human clicking button
+  // Get file which is gonna use anyway
   const file = await getFile(params.fileId);
   if (!file) {
     redirect("/?message=Page+Not+Found");
     throw new Response("Not Found", { status: 404 });
   }
+  console.log("File:", file);
+
+  // * is human cancel submission
+  if (formObj.intent === "cancelSubmission") {
+    console.log("intent: cancelSubmission");
+    // if file is newly created, delete it
+    if (!file.magnet) {
+      deleteFile(params.fileId);
+    }
+
+    // else, don't save changes
+    // * no need to redirect, client side will navigate(-1)
+    return null;
+  }
+
+  // * Is human clicking button
+  console.log("intent: saveFile");
 
   // No file or link provided, delete this record
   if (!formObj.file || !formObj.magnet) {
@@ -311,7 +328,16 @@ export default function EditFile() {
       </label>
       <p>
         <button type="submit">Save</button>
-        <button onClick={() => navigate(-1)} type="button">
+        <button
+          onClick={async () => {
+            fetcher.submit(
+              { intent: "cancelSubmission" },
+              { method: "POST", action: `.` }
+            );
+            navigate(-1);
+          }}
+          type="button"
+        >
           Cancel
         </button>
       </p>

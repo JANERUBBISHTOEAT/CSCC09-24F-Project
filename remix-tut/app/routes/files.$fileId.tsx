@@ -61,7 +61,7 @@ export default function File() {
         <h1>
           {file.filename || file.token ? (
             <>
-              {file.filename} {file.token}
+              {file.filename} #{file.token}
             </>
           ) : (
             <i>No Name</i>
