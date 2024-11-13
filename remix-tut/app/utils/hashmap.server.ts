@@ -20,6 +20,7 @@ export default class HashMap {
     let hash: string;
 
     while (attempts++ < maxRetries) {
+      // TODO: Make 6 a variable that increases when full
       hash = this.crypto.createHash("md5").update(str).digest("hex");
       token = parseInt(hash.slice(0, 6), 16) % 10 ** 6;
 

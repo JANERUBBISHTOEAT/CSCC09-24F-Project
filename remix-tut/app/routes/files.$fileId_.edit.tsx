@@ -46,7 +46,7 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
     }
 
     // Generate & save token
-    const token = await HashMap.genToken(formObj.magnet);
+    const token = await HashMap.genToken(formObj.magnet as string);
     console.log("Token:", token);
 
     return json({ token: token });
@@ -93,6 +93,9 @@ export default function EditFile() {
   const fetcher = useFetcher();
 
   useEffect(() => {
+    // TODO: Adopt a better way to load WebTorrent
+    // ? 1. use the same way as hashmap.server.ts::crypto
+    // ? 2. import normally, and config in tsconfig.json
     const loadWebTorrent = async () => {
       // Get URL to conform to Vite's policy
       const webTorrentUrl = new URL(
@@ -102,7 +105,6 @@ export default function EditFile() {
 
       // console.log("Loading WebTorrent from:", webTorrentUrl);
 
-      // TODO: Load WebTorrent script better
       const script = document.createElement("script");
       script.src = webTorrentUrl;
       script.type = "module";
