@@ -34,7 +34,6 @@
     "@types/webtorrent": "^0.110.0",
     "@typescript-eslint/eslint-plugin": "^6.13.0",
     "@typescript-eslint/parser": "^6.13.0",
-    "crypto-browserify": "^3.12.1",
     "eslint": "^8.47.0",
     "eslint-import-resolver-typescript": "^3.6.1",
     "eslint-plugin-import": "^2.29.1",
@@ -43,7 +42,6 @@
     "eslint-plugin-react-hooks": "^4.6.0",
     "typescript": "^5.1.6",
     "vite": "^5.1.4",
-    "vite-plugin-node-polyfills": "^0.22.0",
     "vite-tsconfig-paths": "^4.3.1"
   },
   "engines": {
