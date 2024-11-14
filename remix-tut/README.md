@@ -15,19 +15,14 @@ This starts your app in development mode, rebuilding assets on file changes.
 
 ## Deployment
 
-First, build your app for production:
-
 ```sh
-npm run build
+docker build -t zheyuanwei/w2w .
+docker run --rm -p 3000:3000 --network="host" zheyuanwei/w2w
 ```
 
-Then run the app in production mode:
-
 ```sh
-npm start
+docker stop $(docker ps -aq)
 ```
-
-Now you'll need to pick a host to deploy it to.
 
 ### DIY
 

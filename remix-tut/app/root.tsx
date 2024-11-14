@@ -17,7 +17,7 @@ import { useEffect } from "react";
 import { createEmptyFile, getFiles } from "~/utils/data.server";
 
 export const links: LinksFunction = () => [
-  { rel: "stylesheet", href: "./app.css" },
+  { rel: "stylesheet", href: "/css/app.css" },
   { rel: "stylesheet", href: "/css/all.min.css" },
   { rel: "stylesheet", href: "/css/toastr.min.css" },
 ];
