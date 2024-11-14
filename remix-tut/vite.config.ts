@@ -4,6 +4,13 @@ import { defineConfig } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
 
 export default defineConfig({
+  server: {
+    https: {
+      key: "./localhost-key.pem",
+      cert: "./localhost-cert.pem",
+      port: 3000,
+    },
+  },
   plugins: [
     remix({
       // ssr: false,
