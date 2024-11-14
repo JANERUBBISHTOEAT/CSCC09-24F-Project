@@ -15,10 +15,9 @@ import {
 } from "@remix-run/react";
 import { useEffect } from "react";
 import { createEmptyFile, getFiles } from "~/utils/data.server";
-import appStylesHref from "./app.css?url";
 
 export const links: LinksFunction = () => [
-  { rel: "stylesheet", href: appStylesHref },
+  { rel: "stylesheet", href: "./app.css" },
   { rel: "stylesheet", href: "/css/all.min.css" },
   { rel: "stylesheet", href: "/css/toastr.min.css" },
 ];
