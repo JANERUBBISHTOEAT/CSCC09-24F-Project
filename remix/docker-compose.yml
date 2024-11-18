@@ -37,6 +37,7 @@ services:
     restart: always
     environment:
       - VIRTUAL_HOST=${VIRTUAL_HOST}
+      - VIRTUAL_PORT=${VIRTUAL_PORT}
       - LETSENCRYPT_HOST=${LETSENCRYPT_HOST}
       - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
       - REDIS_HOST=${REDIS_HOST}
