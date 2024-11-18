@@ -16,3 +16,9 @@ README.md
 # database
 db
 data
+
+# volume
+acme/
+certs/
+html/
+vhost/
