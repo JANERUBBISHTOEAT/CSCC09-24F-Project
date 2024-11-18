@@ -136,3 +136,6 @@ frontend/static/*.min.js
 
 *.key
 *.crt
+
+acme/
+certs/
