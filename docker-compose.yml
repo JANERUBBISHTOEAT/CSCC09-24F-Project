@@ -1,7 +1,7 @@
-version: '2'
+version: "3"
 
 services:
-  # nginx reverse proxy    
+  # nginx reverse proxy
   nginx-proxy:
     image: jwilder/nginx-proxy
     container_name: nginx-proxy
@@ -11,10 +11,10 @@ services:
       - "443:443"
     volumes:
       - /var/run/docker.sock:/tmp/docker.sock:ro
-      - ./certs:/etc/nginx/certs 
-      - ./vhost:/etc/nginx/vhost.d 
-      - ./html:/usr/share/nginx/html 
-      
+      - ./certs:/etc/nginx/certs
+      - ./vhost:/etc/nginx/vhost.d
+      - ./html:/usr/share/nginx/html
+
   # reverse proxy let's encrypt companion
   nginx-proxy-acme:
     image: nginxproxy/acme-companion
@@ -26,30 +26,27 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./acme:/etc/acme.sh
     environment:
-        - DEFAULT_EMAIL=thierry.sans@gmail.com
+      - DEFAULT_EMAIL=w2w.space@domainsbyproxy.com
 
-  # React frontend
-  frontend:
-    image: frontend
-    container_name: frontend
+  # Remix fullstack application
+  remix:
+    image: remix
+    container_name: remix
     restart: always
-    # certificate information for let's encrypt
     environment:
-      - VIRTUAL_HOST=${FRONTEND_DOMAIN}
-      - LETSENCRYPT_HOST=${FRONTEND_DOMAIN}
-  
-  # react backend      
-  backend:
-    image: backend
-    container_name: backend
+      - VIRTUAL_HOST=${w2w.space}
+      - LETSENCRYPT_HOST=${w2w.space}
+      - LETSENCRYPT_EMAIL=w2w.space@domainsbyproxy.com
+    depends_on:
+      - redis
+
+  # Redis database
+  redis:
+    image: redis
+    container_name: redis
     restart: always
     volumes:
-        # volume for the database (persistence)
-        - ./db:/app/db
-    # certificate information for let's encrypt
-    environment:
-      - VIRTUAL_HOST=${BACKEND_DOMAIN}
-      - LETSENCRYPT_HOST=${BACKEND_DOMAIN}
+      - redis-data:/data
 
-        
-        
+volumes:
+  redis-data:
