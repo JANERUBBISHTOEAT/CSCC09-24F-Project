@@ -20,13 +20,14 @@ services:
     image: nginxproxy/acme-companion
     container_name: nginx-proxy-acme
     restart: always
-    volumes_from:
-      - nginx-proxy
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./acme:/etc/acme.sh
+      - ./certs:/etc/nginx/certs
+      - ./vhost:/etc/nginx/vhost.d
+      - ./html:/usr/share/nginx/html
     environment:
-      - DEFAULT_EMAIL=w2w.space@domainsbyproxy.com
+      - DEFAULT_EMAIL=${LETSENCRYPT_EMAIL}
 
   # Remix fullstack application
   remix:
@@ -34,11 +35,13 @@ services:
     container_name: remix
     restart: always
     environment:
-      - VIRTUAL_HOST=${w2w.space}
-      - LETSENCRYPT_HOST=${w2w.space}
-      - LETSENCRYPT_EMAIL=w2w.space@domainsbyproxy.com
+      - VIRTUAL_HOST=${VIRTUAL_HOST}
+      - LETSENCRYPT_HOST=${LETSENCRYPT_HOST}
+      - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
     depends_on:
       - redis
+    ports:
+      - "3000:3000"
 
   # Redis database
   redis:
