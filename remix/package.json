@@ -4,11 +4,11 @@
   "sideEffects": false,
   "type": "module",
   "scripts": {
-    "build": "remix vite:build",
-    "dev": "remix vite:dev",
-    "lint": "eslint --ignore-path .gitignore --cache --cache-location ./node_modules/.cache/eslint .",
-    "start": "remix-serve build/server/index.js",
-    "typecheck": "tsc"
+    "build-remix": "remix vite:build",
+    "dev-remix": "remix vite:dev",
+    "lint-remix": "eslint --ignore-path .gitignore --cache --cache-location ./node_modules/.cache/eslint .",
+    "start-remix": "remix-serve build/server/index.js",
+    "typecheck-remix": "tsc"
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^6.6.0",
