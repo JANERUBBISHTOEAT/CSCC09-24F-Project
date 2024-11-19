@@ -14,11 +14,10 @@ import {
   useSubmit,
 } from "@remix-run/react";
 import { useEffect } from "react";
-import appStylesHref from "./app.css?url";
-import { createEmptyFile, getFiles } from "./data";
+import { createEmptyFile, getFiles } from "~/utils/data.server";
 
 export const links: LinksFunction = () => [
-  { rel: "stylesheet", href: appStylesHref },
+  { rel: "stylesheet", href: "/css/app.css" },
   { rel: "stylesheet", href: "/css/all.min.css" },
   { rel: "stylesheet", href: "/css/toastr.min.css" },
 ];
@@ -107,7 +106,7 @@ export default function App() {
                     >
                       {file.filename || file.token ? (
                         <>
-                          {file.filename} #{file.token}
+                          {file.filename} #{file.token ? file.token : "------"}
                           {/* TODO: Make file.token grey*/}
                         </>
                       ) : (

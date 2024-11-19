@@ -395,7 +395,8 @@ i {
 #contact-form label textarea {
   flex-grow: 2;
 }
-#contact-form label button {
+#contact-form label button,
+#contact-form p:first-of-type button {
   z-index: 1;
   margin-left: -2rem;
   cursor: pointer;

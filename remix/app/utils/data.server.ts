@@ -6,6 +6,7 @@ import { matchSorter } from "match-sorter";
 // @ts-expect-error - no types, but it's a tiny function
 import sortBy from "sort-by";
 import invariant from "tiny-invariant";
+import HashMap from "./hashmap.server";
 
 type FileMutation = {
   id?: string;
@@ -13,7 +14,7 @@ type FileMutation = {
   type?: string;
   size?: number;
   magnet?: string;
-  token?: number;
+  token?: string;
   notes?: string;
   favorite?: boolean;
 };
@@ -21,15 +22,6 @@ type FileMutation = {
 export type FileRecord = FileMutation & {
   id: string;
   createdAt: string;
-};
-
-export const fileIconMap = {
-  "application/pdf": "fas fa-file-pdf",
-  "application/zip": "fas fa-file-archive",
-  "video/mp4": "fas fa-file-video",
-  "image/jpeg": "fas fa-file-image",
-  "image/png": "fas fa-file-image",
-  "text/plain": "fas fa-file-alt",
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -45,6 +37,7 @@ const fakeFiles = {
   },
 
   async get(id: string): Promise<FileRecord | null> {
+    // TODO: Use redis.get
     return fakeFiles.records[id] || null;
   },
 
@@ -52,6 +45,11 @@ const fakeFiles = {
     const id = values.id || Math.random().toString(36).substring(2, 9);
     const createdAt = new Date().toISOString();
     const newFile = { id, createdAt, ...values };
+    if (newFile.magnet) {
+      const token_str = await HashMap.genToken(newFile.magnet);
+      newFile.token = token_str;
+      console.log("Updated token:", newFile.token);
+    }
     fakeFiles.records[id] = newFile;
     return newFile;
   },
@@ -60,6 +58,11 @@ const fakeFiles = {
     const file = await fakeFiles.get(id);
     invariant(file, `No file found for ${id}`);
     const updatedFile = { ...file, ...values };
+    if (updatedFile.magnet) {
+      const token_str = await HashMap.genToken(updatedFile.magnet);
+      updatedFile.token = token_str;
+      console.log("Updated token:", updatedFile.token);
+    }
     fakeFiles.records[id] = updatedFile;
     return updatedFile;
   },
@@ -104,32 +107,3 @@ export async function updateFile(id: string, updates: FileMutation) {
 export async function deleteFile(id: string) {
   fakeFiles.destroy(id);
 }
-
-[
-  {
-    magnet: "magnet:?xt=...",
-    filename: "file.pdf",
-    type: "application/pdf",
-    token: 100100,
-    notes: "Hello world",
-  },
-  {
-    magnet: "magnet:?xt=...",
-    filename: "file.mp4",
-    type: "video/mp4",
-    token: 200200,
-    notes: "",
-  },
-  {
-    magnet: "magnet:?xt=...",
-    filename: "file.zip",
-    type: "application/zip",
-    token: 300300,
-    notes: "",
-  },
-].forEach((file) => {
-  fakeFiles.create({
-    ...file,
-    id: `${file.filename.toLowerCase()}-${file.token}`,
-  });
-});

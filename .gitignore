@@ -131,4 +131,11 @@ dist
 
 frontend/static/*.min.js
 *.pdf
-remix-tut/public/webtorrent.min.js
+# remix-tut/public/webtorrent.min.js
+*.rdb
+
+*.key
+*.crt
+
+acme/
+certs/

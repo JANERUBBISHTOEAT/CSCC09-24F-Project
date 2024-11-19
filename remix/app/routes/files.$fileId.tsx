@@ -1,20 +1,21 @@
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import { json } from "@remix-run/node";
-import { Form, useFetcher, useLoaderData } from "@remix-run/react";
+import { json, redirect } from "@remix-run/node";
+import { Form, useFetcher, useLoaderData, useLocation } from "@remix-run/react";
 import type { FunctionComponent } from "react";
-import invariant from "tiny-invariant";
-import type { FileRecord } from "../data";
-import { getFile, updateFile, fileIconMap } from "../data";
-import { useLocation } from "@remix-run/react";
 import { useEffect } from "react";
+import invariant from "tiny-invariant";
 import toastr from "toastr";
 import "toastr/build/toastr.min.css";
+import { fileIconMap } from "~/utils/constants";
+import type { FileRecord } from "~/utils/data.server";
+import { getFile, updateFile } from "~/utils/data.server";
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   invariant(params.fileId, "Missing fileId param");
   const file = await getFile(params.fileId);
   if (!file) {
+    redirect("/?message=Page+Not+Found");
     throw new Response("Not Found", { status: 404 });
   }
   return json({ file: file });
@@ -60,7 +61,7 @@ export default function File() {
         <h1>
           {file.filename || file.token ? (
             <>
-              {file.filename} {file.token}
+              {file.filename} #{file.token}
             </>
           ) : (
             <i>No Name</i>
