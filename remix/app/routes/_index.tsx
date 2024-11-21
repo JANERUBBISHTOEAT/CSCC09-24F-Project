@@ -50,7 +50,6 @@ export default function Index() {
       toastr.warning(message);
       window.history.replaceState({}, "", location.pathname);
     }
-    console.log("Index page location:", location);
   }, [location]);
 
   return (
