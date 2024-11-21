@@ -135,10 +135,10 @@ export default function EditFile() {
 
     // Seed the file
     const selectedFile = files[0];
-    clientRef.current.seed(selectedFile, async (torrent) => {
+    clientRef.current.seed(selectedFile, async (torrent: any) => {
+      console.log("Client is seeding:", torrent.magnetURI);
       clearTimeout(timeoutId);
       setTorrent(torrent);
-      console.log("Client is seeding:", torrent.magnetURI);
 
       // [ ] Call action with intend to acquire token
       const formData = new FormData();
