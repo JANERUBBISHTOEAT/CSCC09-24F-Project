@@ -16,8 +16,7 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
   invariant(params.fileId, "Missing fileId param");
   const file = await getFile(params.fileId);
   if (!file) {
-    redirect("/?message=Page+Not+Found");
-    throw new Response("Not Found", { status: 404 });
+    return redirect("/?message=Page+Not+Found");
   }
   return json({ file: file });
 };
