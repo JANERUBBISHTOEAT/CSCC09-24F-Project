@@ -1,4 +1,0 @@
-- [ ] Dont use NeDB in production
-- [ ] Connect to MongoDB or sth
-- [ ] Design schema
-- [ ] Build API
