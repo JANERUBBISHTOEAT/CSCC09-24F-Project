@@ -5,4 +5,5 @@ export const fileIconMap = {
   "image/jpeg": "fas fa-file-image",
   "image/png": "fas fa-file-image",
   "text/plain": "fas fa-file-alt",
+  "application/x-zip-compressed": "fas fa-file-archive",
 };
