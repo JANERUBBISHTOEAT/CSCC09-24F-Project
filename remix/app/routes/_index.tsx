@@ -1,4 +1,7 @@
-import { useLocation } from "@remix-run/react";
+import { GoogleLogin, GoogleOAuthProvider } from "@react-oauth/google";
+import { json, LoaderFunction, LoaderFunctionArgs } from "@remix-run/node";
+import { useLoaderData, useLocation } from "@remix-run/react";
+import dotenv from "dotenv";
 import { useEffect, useRef, useState } from "react";
 import Swal from "sweetalert2";
 import "sweetalert2/dist/sweetalert2.min.css";
@@ -7,10 +10,21 @@ import toastr from "toastr";
 import "toastr/build/toastr.min.css";
 import { prettyBytes } from "../utils/functions";
 
+if (typeof window === "undefined") {
+  // Server-side
+  dotenv.config();
+}
+
+export const loader: LoaderFunction = async () => {
+  return json({ googleClientId: process.env.GOOGLE_CLIENT_ID });
+};
+
 export default function Index() {
+  const { googleClientId } = useLoaderData<{ googleClientId: string }>();
   const location = useLocation();
   const [torrent, setTorrent] = useState<any | null>(null);
   const clientRef = useRef<any | null>(null);
+  const client_id = googleClientId || "";
 
   async function loadModule() {
     console.log("Loading WebTorrent module");
@@ -125,6 +139,21 @@ export default function Index() {
       <div id="down_speed"></div>
       <div id="up_speed"></div>
       <div id="peers"></div>
+      <div className="google-login-container">
+        <GoogleOAuthProvider clientId={client_id}>
+          <div>
+            <h1>Login</h1>
+            <GoogleLogin
+              onSuccess={(credentialResponse) => {
+                console.log(credentialResponse);
+              }}
+              onError={() => {
+                console.log("Login Failed");
+              }}
+            />
+          </div>
+        </GoogleOAuthProvider>
+      </div>
     </div>
   );
 }
