@@ -37,6 +37,9 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
     const credential = formObj.credential as string;
     const decoded = jwtDecode(credential);
     console.log("Decoded:", decoded);
+
+    // Login user
+
     return json({ decoded: decoded });
   }
 };

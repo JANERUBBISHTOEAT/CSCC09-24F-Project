@@ -9,7 +9,6 @@ import toastr from "toastr";
 import "toastr/build/toastr.min.css";
 import { fileIconMap } from "~/utils/constants";
 import type { FileRecord } from "~/utils/data.server";
-import { getFile, updateFile } from "~/utils/data.server";
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   invariant(params.fileId, "Missing fileId param");
