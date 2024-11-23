@@ -9,6 +9,9 @@ import invariant from "tiny-invariant";
 import toastr from "toastr";
 import "toastr/build/toastr.min.css";
 import { prettyBytes } from "../utils/functions";
+import { ActionFunctionArgs } from "@remix-run/node";
+import { useFetcher } from "@remix-run/react";
+import { jwtDecode } from "jwt-decode";
 
 if (typeof window === "undefined") {
   // Server-side
@@ -19,12 +22,32 @@ export const loader: LoaderFunction = async () => {
   return json({ googleClientId: process.env.GOOGLE_CLIENT_ID });
 };
 
+export const action = async ({ params, request }: ActionFunctionArgs) => {
+  console.log("Action params:", params);
+  // Invariant check
+
+  // Check intent
+  const formData = await request.formData();
+  const formObj = Object.fromEntries(formData);
+  console.log("formObj:", formObj);
+
+  // * Is OAuth callback
+  if (formObj.intent === "OAuthCallback") {
+    console.log("intent: OAuthCallback");
+    const credential = formObj.credential as string;
+    const decoded = jwtDecode(credential);
+    console.log("Decoded:", decoded);
+    return json({ decoded: decoded });
+  }
+};
+
 export default function Index() {
   const { googleClientId } = useLoaderData<{ googleClientId: string }>();
   const location = useLocation();
   const [torrent, setTorrent] = useState<any | null>(null);
   const clientRef = useRef<any | null>(null);
   const client_id = googleClientId || "";
+  const fetcher = useFetcher();
 
   async function loadModule() {
     console.log("Loading WebTorrent module");
@@ -146,6 +169,16 @@ export default function Index() {
             <GoogleLogin
               onSuccess={(credentialResponse) => {
                 console.log(credentialResponse);
+                fetcher.submit(
+                  {
+                    intent: "OAuthCallback",
+                    credential: credentialResponse.credential || "",
+                  },
+                  {
+                    method: "POST",
+                    action: ".",
+                  }
+                );
               }}
               onError={() => {
                 console.log("Login Failed");
