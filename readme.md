@@ -60,6 +60,20 @@ The final version of the application will incorporate the following additional f
 
 ![System_Design](./Structure-v2.drawio.svg)
 
+Visitor/Logged-in User state machine (simplified):
+
+```mermaid
+stateDiagram-v2
+    state "NotLoggedIn/Empty" as S1
+    state "NotLoggedIn/NonEmpty" as S2
+    state "LoggedIn/NonEmpty" as S3
+
+    S1 --> S3 : login + merge
+    S1 --> S2 : add files
+    S2 --> S3 : login + merge
+    S3 --> S1 : login + clear
+```
+
 ### Frontend
 
 - `Remix` will be used for the frontend.
