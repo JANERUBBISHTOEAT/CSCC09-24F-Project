@@ -12,7 +12,11 @@ import { prettyBytes } from "../utils/functions";
 import { ActionFunctionArgs } from "@remix-run/node";
 import { useFetcher } from "@remix-run/react";
 import { jwtDecode } from "jwt-decode";
-import { getSession, commitSession } from "~/utils/session.server";
+import {
+  getSession,
+  commitSession,
+  destroySession,
+} from "~/utils/session.server";
 
 if (typeof window === "undefined") {
   // Server-side
@@ -48,6 +52,17 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
     return json(
       { user: decoded },
       { headers: { "Set-Cookie": await commitSession(session) } }
+    );
+  }
+
+  // * Is Logout
+  if (formObj.intent === "Logout") {
+    console.log("intent: Logout");
+    const session = await getSession(request);
+
+    return json(
+      { user: null },
+      { headers: { "Set-Cookie": await destroySession(session) } }
     );
   }
 };
@@ -166,6 +181,35 @@ export default function Index() {
     }
   }, [fetcher.data]);
 
+  const handleLogin = (credentialResponse: any) => {
+    fetcher.load(".");
+    fetcher.submit(
+      {
+        intent: "OAuthCallback",
+        credential: credentialResponse.credential || "",
+      },
+      {
+        method: "POST",
+        action: ".",
+      }
+    );
+    setLoggedIn(true);
+  };
+
+  const handleLogout = () => {
+    fetcher.load(".");
+    fetcher.submit(
+      {
+        intent: "Logout",
+      },
+      {
+        method: "POST",
+        action: ".",
+      }
+    );
+    setLoggedIn(false);
+  };
+
   return (
     <div id="index-page">
       <p>Download using magnet link:</p>
@@ -187,8 +231,7 @@ export default function Index() {
           <p>You are logged in as {user?.name || initialUser?.name}</p>
           <button
             onClick={() => {
-              // TODO: Make a logout action
-              setLoggedIn(false);
+              handleLogout();
             }}
           >
             Logout
@@ -200,18 +243,7 @@ export default function Index() {
             <GoogleLogin
               onSuccess={(credentialResponse) => {
                 console.log(credentialResponse);
-                setLoggedIn(true);
-                fetcher.load(".");
-                fetcher.submit(
-                  {
-                    intent: "OAuthCallback",
-                    credential: credentialResponse.credential || "",
-                  },
-                  {
-                    method: "POST",
-                    action: ".",
-                  }
-                );
+                handleLogin(credentialResponse);
               }}
               onError={() => {
                 console.log("Login Failed");
