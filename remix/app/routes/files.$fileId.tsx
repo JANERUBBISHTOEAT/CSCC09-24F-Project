@@ -4,6 +4,8 @@ import { json, redirect } from "@remix-run/node";
 import { Form, useFetcher, useLoaderData, useLocation } from "@remix-run/react";
 import type { FunctionComponent } from "react";
 import { useEffect } from "react";
+import Swal from "sweetalert2";
+import "sweetalert2/dist/sweetalert2.min.css";
 import invariant from "tiny-invariant";
 import toastr from "toastr";
 import "toastr/build/toastr.min.css";
@@ -33,7 +35,7 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
   });
 };
 
-// TODO: Remove contact page, use edit page
+// [x] Remove contact page, use edit page
 export default function File() {
   const location = useLocation();
 
@@ -90,13 +92,19 @@ export default function File() {
           <Form
             action="destroy"
             method="post"
-            onSubmit={(event) => {
-              // TODO: Make this Swal
-              const response = confirm(
-                "Please confirm you want to delete this record."
-              );
-              if (!response) {
-                event.preventDefault();
+            onSubmit={async (event) => {
+              event.preventDefault();
+
+              const result = await Swal.fire({
+                title: "Are you sure?",
+                text: "Please confirm you want to delete this record.",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonText: "Yes, delete it!",
+              });
+
+              if (result.isConfirmed) {
+                (event.target as HTMLFormElement).submit();
               }
             }}
           >
