@@ -228,7 +228,9 @@ export default function Index() {
       <div id="peers"></div>
       <div className="google-login-container">
         <div className={loggedIn ? "" : "hidden"}>
-          <p>You are logged in as {user?.name || initialUser?.name}</p>
+          <p>
+            You are logged in as {user?.name || initialUser?.name || "visitor"}
+          </p>
           <button
             onClick={() => {
               handleLogout();

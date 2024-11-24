@@ -10,16 +10,13 @@ import "toastr/build/toastr.min.css";
 import { fileIconMap } from "~/utils/constants";
 import type { FileRecord } from "~/utils/data.server";
 import { getFile, updateFile } from "~/utils/data.server";
-import { getUserSession } from "~/utils/session.server";
+import { getUserSession, getVisitorSession } from "~/utils/session.server";
 
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   invariant(params.fileId, "Missing fileId param");
   const user = await getUserSession(request);
-  if (!user) {
-    // TODO: Visitor access (localstorage)
-    return redirect("/?message=Please+login+to+view+files");
-  }
-  const file = await getFile(user.sub, params.fileId);
+  const visitor = await getVisitorSession(request);
+  const file = await getFile(user?.sub || visitor?.sub, params.fileId);
   if (!file) {
     return redirect("/?message=Page+Not+Found");
   }
@@ -30,7 +27,8 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
   invariant(params.fileId, "Missing fileId param");
   const formData = await request.formData();
   const user = await getUserSession(request);
-  return updateFile(user.sub, params.fileId, {
+  const visitor = await getVisitorSession(request);
+  return updateFile(user?.sub || visitor?.sub, params.fileId, {
     favorite: formData.get("favorite") === "true",
   });
 };

@@ -1,5 +1,6 @@
 import { matchSorter } from "match-sorter";
-import sortBy from "sort-by";
+// import sortBy from "sort-by";
+import orderBy from "lodash/orderBy";
 import invariant from "tiny-invariant";
 import HashMap from "./hashmap.server";
 import Redis from "ioredis";
@@ -21,6 +22,7 @@ type FileMutation = {
   token?: string;
   notes?: string;
   favorite?: boolean;
+  // TODO: Add attr `sender/receiver`
 };
 
 export type FileRecord = FileMutation & {
@@ -36,7 +38,7 @@ const fakeFiles = {
     const files = await Promise.all(
       keys.map((key) => redis.hget(userFilesKey(userId), key).then(JSON.parse))
     );
-    return files.sort(sortBy("-createdAt", "last"));
+    return orderBy(files, "createdAt", "desc");
   },
 
   async get(userId: string, id: string): Promise<FileRecord | null> {
@@ -50,7 +52,7 @@ const fakeFiles = {
     const newFile = { id, createdAt, ...values };
     if (newFile.magnet) {
       const token_str = await HashMap.genToken(newFile.magnet);
-      newFile.token = token_str;
+      newFile.token = token_str ?? undefined;
       console.log("Updated token:", newFile.token);
     }
     await redis.hset(userFilesKey(userId), id, JSON.stringify(newFile));
@@ -67,7 +69,7 @@ const fakeFiles = {
     const updatedFile = { ...file, ...values };
     if (updatedFile.magnet) {
       const token_str = await HashMap.genToken(updatedFile.magnet);
-      updatedFile.token = token_str;
+      updatedFile.token = token_str ?? undefined;
       console.log("Updated token:", updatedFile.token);
     }
     await redis.hset(userFilesKey(userId), id, JSON.stringify(updatedFile));
@@ -88,7 +90,7 @@ export async function getFiles(userId: string, query?: string | null) {
       keys: ["filename", "token"],
     });
   }
-  return files.sort(sortBy("last", "createdAt"));
+  return orderBy(files, "createdAt", "desc");
 }
 
 export async function createEmptyFile(userId: string) {

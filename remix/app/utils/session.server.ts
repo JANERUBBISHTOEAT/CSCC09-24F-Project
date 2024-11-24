@@ -31,3 +31,9 @@ export async function getUserSession(
   const session = await getSession(request);
   return session.get("user");
 }
+export async function getVisitorSession(
+  request: Request
+): Promise<{ sub: string }> {
+  const session = await getSession(request);
+  return session.get("visitor");
+}
