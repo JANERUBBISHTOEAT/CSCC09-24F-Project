@@ -1,13 +1,10 @@
-import "@fortawesome/fontawesome-free/css/all.min.css";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 import { Form, useFetcher, useLoaderData, useNavigate } from "@remix-run/react";
 import { useEffect, useRef, useState } from "react";
 import Swal from "sweetalert2";
-import "sweetalert2/dist/sweetalert2.min.css";
 import invariant from "tiny-invariant";
 import toastr from "toastr";
-import "toastr/build/toastr.min.css";
 import { fileIconMap } from "~/utils/constants";
 import { deleteFile, getFile, updateFile } from "~/utils/data.server";
 import HashMap from "~/utils/hashmap.server";

@@ -4,11 +4,8 @@ import { useFetcher, useLoaderData, useLocation } from "@remix-run/react";
 import dotenv from "dotenv";
 import { jwtDecode } from "jwt-decode";
 import { useEffect, useRef, useState } from "react";
-import Swal from "sweetalert2";
-import "sweetalert2/dist/sweetalert2.min.css";
 import invariant from "tiny-invariant";
 import toastr from "toastr";
-import "toastr/build/toastr.min.css";
 import { mergeFiles } from "~/utils/data.server";
 import {
   commitSession,

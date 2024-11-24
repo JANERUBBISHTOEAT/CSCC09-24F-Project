@@ -21,6 +21,9 @@ import {
   getUserSession,
   getVisitorSession,
 } from "./utils/session.server";
+import "sweetalert2/dist/sweetalert2.min.css";
+import "toastr/build/toastr.min.css";
+import "@fortawesome/fontawesome-free/css/all.min.css";
 
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: "/css/app.css" },
