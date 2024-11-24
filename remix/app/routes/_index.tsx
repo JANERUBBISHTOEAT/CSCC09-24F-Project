@@ -1,23 +1,23 @@
 import { GoogleLogin, GoogleOAuthProvider } from "@react-oauth/google";
-import { json, LoaderFunction, LoaderFunctionArgs } from "@remix-run/node";
-import { useLoaderData, useLocation } from "@remix-run/react";
+import { ActionFunctionArgs, json, LoaderFunction } from "@remix-run/node";
+import { useFetcher, useLoaderData, useLocation } from "@remix-run/react";
 import dotenv from "dotenv";
+import { jwtDecode } from "jwt-decode";
 import { useEffect, useRef, useState } from "react";
 import Swal from "sweetalert2";
 import "sweetalert2/dist/sweetalert2.min.css";
 import invariant from "tiny-invariant";
 import toastr from "toastr";
 import "toastr/build/toastr.min.css";
-import { prettyBytes } from "../utils/functions";
-import { ActionFunctionArgs } from "@remix-run/node";
-import { useFetcher } from "@remix-run/react";
-import { jwtDecode } from "jwt-decode";
+import { mergeFiles } from "~/utils/data.server";
 import {
-  getSession,
   commitSession,
   destroySession,
+  getSession,
   getUserSession,
+  getVisitorSession,
 } from "~/utils/session.server";
+import { prettyBytes } from "../utils/functions";
 
 if (typeof window === "undefined") {
   // Server-side
@@ -48,6 +48,16 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
     // Login user
     const session = await getSession(request);
     session.set("user", decoded);
+
+    // Merge visitor session
+    const visitor = await getVisitorSession(request);
+    if (visitor) {
+      if (decoded.sub && visitor.sub) {
+        mergeFiles(decoded.sub, visitor.sub);
+      } else {
+        console.error("User ID or Visitor ID is undefined");
+      }
+    }
 
     return json(
       { user: decoded },

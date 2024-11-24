@@ -47,6 +47,19 @@ const fakeFiles = {
   },
 
   async create(userId: string, values: FileMutation): Promise<FileRecord> {
+    // Check duplicate file (happens when merging visitor profile)
+    const files = await fakeFiles.getAll(userId);
+    const duplicateFile = files.find(
+      (file) =>
+        file.magnet === values.magnet && file.filename === values.filename
+    );
+
+    if (duplicateFile) {
+      // Do not create, return existing file
+      return duplicateFile;
+    }
+
+    // Create new file
     const id = values.id || Math.random().toString(36).substring(2, 9);
     const createdAt = new Date().toISOString();
     const newFile = { id, createdAt, ...values };
@@ -117,4 +130,16 @@ export async function updateFile(
 
 export async function deleteFile(userId: string, id: string) {
   await fakeFiles.destroy(userId, id);
+}
+
+// Merge visitor files to existing user files
+export async function mergeFiles(
+  userId: string,
+  visitorId: string
+): Promise<FileRecord[]> {
+  const visitorFiles = await fakeFiles.getAll(visitorId);
+  console.log("Merging", visitorFiles.length, "files from", visitorId);
+  await Promise.all(visitorFiles.map((file) => fakeFiles.create(userId, file)));
+  await redis.del(userFilesKey(visitorId));
+  return fakeFiles.getAll(userId);
 }
