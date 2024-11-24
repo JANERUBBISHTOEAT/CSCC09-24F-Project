@@ -17,7 +17,7 @@ export default class HashMap {
   }
 
   static async genKey(str: string): Promise<number> {
-    // TODO: Check collision
+    // [x]: Check collision
     if (!this.crypto) this.crypto = await import("crypto");
 
     const maxRetries = 10;
@@ -26,7 +26,7 @@ export default class HashMap {
     let hash: string;
 
     while (attempts++ < maxRetries) {
-      // TODO: Make 6 a variable that increases when full
+      // [ ]: Make 6 a variable that increases when full
       hash = this.crypto.createHash("md5").update(str).digest("hex");
       token = parseInt(hash.slice(0, 6), 16) % 10 ** 6;
 
@@ -35,7 +35,10 @@ export default class HashMap {
     }
     if (attempts === maxRetries) {
       console.error("genKey failed with attempts", attempts);
-      console.info("Redis health:", (await this.getKeysCnt()) / 10 ** 6);
+      console.info(
+        "Redis health:",
+        ((await this.getKeysCnt()) || -1) / 10 ** 6
+      );
       token = -1;
     }
 
@@ -47,7 +50,7 @@ export default class HashMap {
     magnet: string,
     expiry: number = 60 * 60
   ): Promise<void | null> {
-    console.info("Redis health:", (await this.getKeysCnt()) / 10 ** 6);
+    console.info("Redis health:", ((await this.getKeysCnt()) || -1) / 10 ** 6);
     if (!redis) return null;
     await redis.hset("tokenMap", token, magnet);
     await redis.expire("tokenMap", expiry);
@@ -72,7 +75,7 @@ export default class HashMap {
     if (!redis || !magnet) return "";
     const token_num = await HashMap.genKey(magnet);
     const token_str = token_num.toString().padStart(6, "0");
-    HashMap.set(token_str, magnet); // TODO: Add expiry
+    HashMap.set(token_str, magnet); // [ ]: Add expiry and return to caller
     return token_str;
   }
 }

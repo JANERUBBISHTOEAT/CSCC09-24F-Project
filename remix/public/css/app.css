@@ -456,3 +456,14 @@ i {
   justify-content: center;
   width: 100%;
 }
+
+.google-login-container {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin: 10px;
+}
+
+.hidden {
+  display: none;
+}

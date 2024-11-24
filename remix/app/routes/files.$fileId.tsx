@@ -1,19 +1,21 @@
-import "@fortawesome/fontawesome-free/css/all.min.css";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 import { Form, useFetcher, useLoaderData, useLocation } from "@remix-run/react";
 import type { FunctionComponent } from "react";
 import { useEffect } from "react";
+import Swal from "sweetalert2";
 import invariant from "tiny-invariant";
 import toastr from "toastr";
-import "toastr/build/toastr.min.css";
 import { fileIconMap } from "~/utils/constants";
 import type { FileRecord } from "~/utils/data.server";
 import { getFile, updateFile } from "~/utils/data.server";
+import { getUserSession, getVisitorSession } from "~/utils/session.server";
 
-export const loader = async ({ params }: LoaderFunctionArgs) => {
+export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   invariant(params.fileId, "Missing fileId param");
-  const file = await getFile(params.fileId);
+  const user = await getUserSession(request);
+  const visitor = await getVisitorSession(request);
+  const file = await getFile(user?.sub || visitor?.sub, params.fileId);
   if (!file) {
     return redirect("/?message=Page+Not+Found");
   }
@@ -23,12 +25,14 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
 export const action = async ({ params, request }: ActionFunctionArgs) => {
   invariant(params.fileId, "Missing fileId param");
   const formData = await request.formData();
-  return updateFile(params.fileId, {
+  const user = await getUserSession(request);
+  const visitor = await getVisitorSession(request);
+  return updateFile(user?.sub || visitor?.sub, params.fileId, {
     favorite: formData.get("favorite") === "true",
   });
 };
 
-// TODO: Remove contact page, use edit page
+// [x] Remove contact page, use edit page
 export default function File() {
   const location = useLocation();
 
@@ -85,12 +89,19 @@ export default function File() {
           <Form
             action="destroy"
             method="post"
-            onSubmit={(event) => {
-              const response = confirm(
-                "Please confirm you want to delete this record."
-              );
-              if (!response) {
-                event.preventDefault();
+            onSubmit={async (event) => {
+              event.preventDefault();
+
+              const result = await Swal.fire({
+                title: "Are you sure?",
+                text: "Please confirm you want to delete this record.",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonText: "Yes, delete it!",
+              });
+
+              if (result.isConfirmed) {
+                (event.target as HTMLFormElement).submit();
               }
             }}
           >
