@@ -24,3 +24,10 @@ export async function commitSession(session: any) {
 export async function destroySession(session: any) {
   return sessionStorage.destroySession(session);
 }
+
+export async function getUserSession(
+  request: Request
+): Promise<{ sub: string }> {
+  const session = await getSession(request);
+  return session.get("user");
+}

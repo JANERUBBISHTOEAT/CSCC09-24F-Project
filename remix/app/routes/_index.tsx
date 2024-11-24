@@ -16,6 +16,7 @@ import {
   getSession,
   commitSession,
   destroySession,
+  getUserSession,
 } from "~/utils/session.server";
 
 if (typeof window === "undefined") {
@@ -24,8 +25,7 @@ if (typeof window === "undefined") {
 }
 
 export const loader: LoaderFunction = async ({ request }) => {
-  const session = await getSession(request);
-  const user = session.get("user");
+  const user = await getUserSession(request);
   return json({ googleClientId: process.env.GOOGLE_CLIENT_ID, user: user });
 };
 

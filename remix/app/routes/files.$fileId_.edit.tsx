@@ -11,10 +11,13 @@ import "toastr/build/toastr.min.css";
 import { fileIconMap } from "~/utils/constants";
 import { deleteFile, getFile, updateFile } from "~/utils/data.server";
 import HashMap from "~/utils/hashmap.server";
+import { getUserSession } from "~/utils/session.server";
 
-export const loader = async ({ params }: LoaderFunctionArgs) => {
+export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   invariant(params.fileId, "Missing fileId param");
-  const file = await getFile(params.fileId);
+  const user = await getUserSession(request);
+  const file = await getFile(user.sub, params.fileId);
+  console.log("File:", file);
   if (!file) {
     return redirect("/?message=Page+Not+Found");
   }
@@ -46,7 +49,8 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
   }
 
   // Get file which is gonna use anyway
-  const file = await getFile(params.fileId);
+  const user = await getUserSession(request);
+  const file = await getFile(user.sub, params.fileId);
   if (!file) {
     redirect("/?message=Page+Not+Found");
     throw new Response("Not Found", { status: 404 });
@@ -58,7 +62,7 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
     console.log("intent: cancelSubmission");
     // if file is newly created, delete it
     if (!file.magnet) {
-      deleteFile(params.fileId);
+      deleteFile(user.sub, params.fileId);
     }
 
     // else, don't save changes
@@ -71,7 +75,7 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
 
   // No file or link provided, delete this record
   if (!formObj.file || !formObj.magnet) {
-    deleteFile(params.fileId);
+    deleteFile(user.sub, params.fileId);
     return redirect("/?message=File+not+saved");
   }
 
@@ -87,7 +91,7 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
 
   console.log("Updates:", updates);
 
-  const newFile = await updateFile(params.fileId, updates);
+  const newFile = await updateFile(user.sub, params.fileId, updates);
   // TODO: Update token element
   return redirect(`/files/${params.fileId}/?message=File+saved`);
 };

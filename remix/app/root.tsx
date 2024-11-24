@@ -15,6 +15,7 @@ import {
 } from "@remix-run/react";
 import { useEffect } from "react";
 import { createEmptyFile, getFiles } from "~/utils/data.server";
+import { getUserSession } from "./utils/session.server";
 
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: "/css/app.css" },
@@ -26,12 +27,14 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   // TODO: Add user authentication
   const url = new URL(request.url);
   const q = url.searchParams.get("q");
-  const files = await getFiles(q);
+  const user = await getUserSession(request);
+  const files = await getFiles(user.sub, q);
   return json({ files: files, q });
 };
 
-export const action = async () => {
-  const file = await createEmptyFile();
+export const action = async ({ request }) => {
+  const user = await getUserSession(request);
+  const file = await createEmptyFile(user.sub);
   return redirect(`/files/${file.id}/edit`);
 };
 
