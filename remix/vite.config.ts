@@ -15,6 +15,7 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
+      "~": "/app",
       webtorrent: fileURLToPath(
         new URL(
           "./node_modules/webtorrent/dist/webtorrent.min.js",
