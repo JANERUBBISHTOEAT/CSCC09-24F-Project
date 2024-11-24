@@ -44,9 +44,11 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
     // Login user
     const session = await getSession(request);
     session.set("user", decoded);
-    await commitSession(session);
 
-    return json({ user: decoded });
+    return json(
+      { user: decoded },
+      { headers: { "Set-Cookie": await commitSession(session) } }
+    );
   }
 };
 
@@ -63,7 +65,7 @@ export default function Index() {
     googleClientId: string;
     user: Record<string, any>;
   }>();
-  const [loggedIn, setLoggedIn] = useState(false);
+  const [loggedIn, setLoggedIn] = useState(initialUser ? true : false);
   const [user, setUser] = useState<Record<string, any> | null>(null);
 
   async function loadModule() {
