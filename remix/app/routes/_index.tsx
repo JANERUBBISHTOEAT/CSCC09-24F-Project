@@ -12,14 +12,17 @@ import { prettyBytes } from "../utils/functions";
 import { ActionFunctionArgs } from "@remix-run/node";
 import { useFetcher } from "@remix-run/react";
 import { jwtDecode } from "jwt-decode";
+import { getSession, commitSession } from "~/utils/session.server";
 
 if (typeof window === "undefined") {
   // Server-side
   dotenv.config();
 }
 
-export const loader: LoaderFunction = async () => {
-  return json({ googleClientId: process.env.GOOGLE_CLIENT_ID });
+export const loader: LoaderFunction = async ({ request }) => {
+  const session = await getSession(request);
+  const user = session.get("user");
+  return json({ googleClientId: process.env.GOOGLE_CLIENT_ID, user: user });
 };
 
 export const action = async ({ params, request }: ActionFunctionArgs) => {
@@ -37,17 +40,28 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
     const credential = formObj.credential as string;
     const decoded = jwtDecode(credential);
     console.log("Decoded:", decoded);
+
+    // Login user
+    const session = await getSession(request);
+    session.set("user", decoded);
+    await commitSession(session);
+    console.log("Session:", session);
+
     return json({ decoded: decoded });
   }
 };
 
 export default function Index() {
-  const { googleClientId } = useLoaderData<{ googleClientId: string }>();
+  const { googleClientId, user } = useLoaderData<{
+    googleClientId: string;
+    user: Record<string, any>;
+  }>();
   const location = useLocation();
   const [torrent, setTorrent] = useState<any | null>(null);
   const clientRef = useRef<any | null>(null);
   const client_id = googleClientId || "";
   const fetcher = useFetcher();
+  const [loggedIn, setLoggedIn] = useState(false);
 
   async function loadModule() {
     console.log("Loading WebTorrent module");
@@ -143,12 +157,7 @@ export default function Index() {
 
   return (
     <div id="index-page">
-      <p>
-        Download page under construction 🚧
-        <br />
-        Check out download sample{" "}
-        <a href="https://instant.io/">https://instant.io/</a>.
-      </p>
+      <p>Download using magnet link:</p>
       <input
         type="text"
         name="magnet"
@@ -163,12 +172,24 @@ export default function Index() {
       <div id="up_speed"></div>
       <div id="peers"></div>
       <div className="google-login-container">
+        <div className={loggedIn ? "" : "hidden"}>
+          <p>You are logged in as {user?.name}</p>
+          <button
+            onClick={() => {
+              // TODO: Make a logout action
+              setLoggedIn(false);
+            }}
+          >
+            Logout
+          </button>
+        </div>
         <GoogleOAuthProvider clientId={client_id}>
-          <div>
-            <h1>Login</h1>
+          <div className={loggedIn ? "hidden" : ""}>
+            <p>or log in to see file history:</p>
             <GoogleLogin
               onSuccess={(credentialResponse) => {
                 console.log(credentialResponse);
+                setLoggedIn(true);
                 fetcher.submit(
                   {
                     intent: "OAuthCallback",

@@ -463,3 +463,7 @@ i {
   gap: 1rem;
   margin: 10px;
 }
+
+.hidden {
+  display: none;
+}
