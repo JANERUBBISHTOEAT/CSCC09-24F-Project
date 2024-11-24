@@ -113,7 +113,7 @@ const fakeFiles = {
 };
 
 export async function getFiles(userId: string, query?: string | null) {
-  await new Promise((resolve) => setTimeout(resolve, 500));
+  await new Promise((resolve) => setTimeout(resolve, 500)); // TODO: Remove all fake delays
   let files = await fakeFiles.getAll(userId);
   if (query) {
     files = matchSorter(files, query, {
