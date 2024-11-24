@@ -91,6 +91,7 @@ export default function File() {
             action="destroy"
             method="post"
             onSubmit={(event) => {
+              // TODO: Make this Swal
               const response = confirm(
                 "Please confirm you want to delete this record."
               );

@@ -22,7 +22,8 @@ type FileMutation = {
   token?: string;
   notes?: string;
   favorite?: boolean;
-  // TODO: Add attr `sender/receiver`
+  // [x]: Add attr `sender/receiver`
+  owner?: boolean;
 };
 
 export type FileRecord = FileMutation & {
@@ -55,6 +56,7 @@ const fakeFiles = {
     );
 
     if (duplicateFile) {
+      console.log("Duplicate file found:", duplicateFile.id);
       // Do not create, return existing file
       return duplicateFile;
     }
@@ -79,6 +81,21 @@ const fakeFiles = {
   ): Promise<FileRecord> {
     const file = await fakeFiles.get(userId, id);
     invariant(file, `No file found for ${id}`);
+
+    // Check duplicate file (happens when manually adding dup)
+    const files = await fakeFiles.getAll(userId);
+    const duplicateFile = files.find(
+      (file) =>
+        file.magnet === values.magnet && file.filename === values.filename
+    );
+
+    if (duplicateFile) {
+      console.log("Duplicate file found:", duplicateFile.id);
+      // Delete this file, return existing file
+      await fakeFiles.destroy(userId, id);
+      return duplicateFile;
+    }
+
     const updatedFile = { ...file, ...values };
     if (updatedFile.magnet) {
       const token_str = await HashMap.genToken(updatedFile.magnet);
@@ -107,7 +124,8 @@ export async function getFiles(userId: string, query?: string | null) {
 }
 
 export async function createEmptyFile(userId: string) {
-  const file = await fakeFiles.create(userId, {});
+  // Only owner can create file
+  const file = await fakeFiles.create(userId, { owner: true });
   return file;
 }
 
@@ -124,8 +142,8 @@ export async function updateFile(
   if (!file) {
     throw new Error(`No file found for ${id}`);
   }
-  await fakeFiles.set(userId, id, { ...file, ...updates });
-  return file;
+  const ret_file = await fakeFiles.set(userId, id, { ...file, ...updates });
+  return ret_file;
 }
 
 export async function deleteFile(userId: string, id: string) {

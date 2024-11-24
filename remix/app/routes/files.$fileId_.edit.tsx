@@ -99,7 +99,7 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
     updates
   );
   // TODO: Update token element
-  return redirect(`/files/${params.fileId}/?message=File+saved`);
+  return redirect(`/files/${newFile.id}/?message=File+saved`);
 };
 
 export default function EditFile() {
