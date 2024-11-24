@@ -4,17 +4,11 @@ import { defineConfig } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
 
 export default defineConfig({
-  // server: {
-  //   https: {
-  //     key: "./server.key",
-  //     cert: "./server.crt",
-  //   },
-  //   host: "0.0.0.0",
-  //   port: 3000,
-  // },
+  esbuild: {
+    drop: ["console", "debugger"],
+  },
   plugins: [
     remix({
-      // ssr: false,
       ignoredRouteFiles: ["**/*.css"],
     }),
     tsconfigPaths(),
