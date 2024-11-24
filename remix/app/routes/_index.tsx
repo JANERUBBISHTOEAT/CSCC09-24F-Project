@@ -45,14 +45,13 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
     const session = await getSession(request);
     session.set("user", decoded);
     await commitSession(session);
-    console.log("Session:", session);
 
-    return json({ decoded: decoded });
+    return json({ user: decoded });
   }
 };
 
 export default function Index() {
-  const { googleClientId, user } = useLoaderData<{
+  const { googleClientId, user: initialUser } = useLoaderData<{
     googleClientId: string;
     user: Record<string, any>;
   }>();
@@ -60,8 +59,12 @@ export default function Index() {
   const [torrent, setTorrent] = useState<any | null>(null);
   const clientRef = useRef<any | null>(null);
   const client_id = googleClientId || "";
-  const fetcher = useFetcher();
+  const fetcher = useFetcher<{
+    googleClientId: string;
+    user: Record<string, any>;
+  }>();
   const [loggedIn, setLoggedIn] = useState(false);
+  const [user, setUser] = useState<Record<string, any> | null>(null);
 
   async function loadModule() {
     console.log("Loading WebTorrent module");
@@ -155,6 +158,12 @@ export default function Index() {
     }
   }, [location]);
 
+  useEffect(() => {
+    if (fetcher.data?.user) {
+      setUser(fetcher.data.user);
+    }
+  }, [fetcher.data]);
+
   return (
     <div id="index-page">
       <p>Download using magnet link:</p>
@@ -173,7 +182,7 @@ export default function Index() {
       <div id="peers"></div>
       <div className="google-login-container">
         <div className={loggedIn ? "" : "hidden"}>
-          <p>You are logged in as {user?.name}</p>
+          <p>You are logged in as {user?.name || initialUser?.name}</p>
           <button
             onClick={() => {
               // TODO: Make a logout action
@@ -190,6 +199,7 @@ export default function Index() {
               onSuccess={(credentialResponse) => {
                 console.log(credentialResponse);
                 setLoggedIn(true);
+                fetcher.load(".");
                 fetcher.submit(
                   {
                     intent: "OAuthCallback",
