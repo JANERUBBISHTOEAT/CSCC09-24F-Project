@@ -147,7 +147,7 @@ export default function EditFile() {
       clearTimeout(timeoutId);
       setTorrent(torrent);
 
-      // [ ] Call action with intend to acquire token
+      // [x] Call action with intend to acquire token
       const formData = new FormData();
       formData.append("intent", "acquireToken");
       formData.append("magnet", torrent.magnetURI);

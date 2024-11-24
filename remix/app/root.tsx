@@ -32,7 +32,7 @@ export const links: LinksFunction = () => [
 ];
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-  // TODO: Add user authentication
+  // [x]: Add user authentication
   const url = new URL(request.url);
   const q = url.searchParams.get("q");
   const user = await getUserSession(request);
@@ -144,7 +144,6 @@ export default function App() {
                       {file.filename || file.token ? (
                         <>
                           {file.filename} #{file.token ? file.token : "------"}
-                          {/* TODO: Make file.token grey*/}
                         </>
                       ) : (
                         <i>No Name</i>
