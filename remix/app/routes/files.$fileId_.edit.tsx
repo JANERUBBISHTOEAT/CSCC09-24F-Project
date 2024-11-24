@@ -95,7 +95,7 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
     params.fileId,
     updates
   );
-  // TODO: Update token element
+  // [x]: Update token element
   return redirect(`/files/${newFile.id}/?message=File+saved`);
 };
 
@@ -103,7 +103,7 @@ export default function EditFile() {
   const { file: dbFileJson } = useLoaderData<typeof loader>();
   const navigate = useNavigate();
 
-  const [file, setFile] = useState<File | null>(null); // TODO: Check if this was unused
+  const [file, setFile] = useState<File | null>(null); // [x] Used for react state
   const [token, setToken] = useState<string | null>(null);
   const [torrent, setTorrent] = useState<any | null>(null);
   const fetcher = useFetcher();

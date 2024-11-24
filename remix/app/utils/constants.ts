@@ -1,4 +1,5 @@
-export const fileIconMap = {
+// [ ] Add more types
+export const fileIconMap: Record<string, string> = {
   "application/pdf": "fas fa-file-pdf",
   "application/zip": "fas fa-file-archive",
   "video/mp4": "fas fa-file-video",
