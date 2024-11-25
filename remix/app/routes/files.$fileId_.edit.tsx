@@ -259,7 +259,7 @@ export default function EditFile() {
         <input
           aria-label="Filename"
           name="fileName"
-          value={file?.name || dbFileJson.filename || ""}
+          defaultValue={file?.name || dbFileJson.filename || ""}
           placeholder="Filename"
           type="text"
         />
@@ -270,21 +270,23 @@ export default function EditFile() {
           placeholder="Token"
           type="text"
           disabled
+          readOnly
         />
         <button id="copy-token" type="button" onClick={handleCopy}>
           Copy
         </button>
       </p>
-      <label>
+      {/* <label className="hidden">
         <span>Share with</span>
         <input
-          value={dbFileJson.notes || ""}
-          name="notes"
+          defaultValue={dbFileJson.notes || ""}
+          name="share"
           placeholder="TODO"
           type="text"
           disabled
+          readOnly
         />
-      </label>
+      </label> */}
       <label>
         <span>File Link</span>
         <input
@@ -294,6 +296,7 @@ export default function EditFile() {
           type="text"
           // type="password"
           disabled
+          readOnly
         />
         <input
           className="hidden"
@@ -308,7 +311,7 @@ export default function EditFile() {
       </label>
       <label>
         <span>Notes</span>
-        <textarea value={dbFileJson.notes || ""} name="notes" rows={6} />
+        <textarea defaultValue={dbFileJson.notes || ""} name="notes" rows={6} />
       </label>
       <input
         type="hidden"
