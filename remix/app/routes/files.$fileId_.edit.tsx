@@ -244,9 +244,10 @@ export default function EditFile() {
         <input
           aria-label="Filename"
           name="fileName"
-          defaultValue={file?.name || dbFileJson.filename || ""}
+          value={file?.name || dbFileJson.filename || ""}
           placeholder="Filename"
           type="text"
+          readOnly
         />
         <input
           aria-label="Token"
