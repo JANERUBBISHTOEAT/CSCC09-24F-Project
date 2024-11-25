@@ -73,19 +73,18 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
   console.log("intent: saveFile");
 
   // No file or link provided, delete this record
-  if (!formObj.file || !formObj.magnet) {
+  if (!formObj.fileName || !formObj.magnet) {
     deleteFile(user?.sub || visitor?.sub, params.fileId);
     return redirect("/?message=File+not+saved");
   }
 
   const updates = {
-    filename:
-      (formObj.file as File).name || file.filename || params.fileId || "",
-    type: (formObj.file as File).type || file.type || "",
-    size: (formObj.file as File).size || file.size || -1,
-    magnet: (formObj.magnet as string) || file.magnet || "",
-    token: (formObj.token as string) || file.token || "",
-    notes: (formObj.notes as string) || file.notes || "",
+    filename: formObj.fileName || file.filename || params.fileId || "",
+    type: formObj.fileType || file.type || "",
+    size: formObj.fileSize || file.size || -1,
+    magnet: formObj.magnet || file.magnet || "",
+    token: formObj.token || file.token || "",
+    notes: formObj.notes || file.notes || "",
   };
 
   console.log("Updates:", updates);
@@ -311,7 +310,27 @@ export default function EditFile() {
         <textarea defaultValue={dbFileJson.notes || ""} name="notes" rows={6} />
       </label>
       <p>
-        <button type="submit">Save</button>
+        <button
+          type="submit"
+          onClick={async (event) => {
+            event.preventDefault();
+
+            // Remove file from request then submit
+            // * File do not go to server
+            const formData = new FormData(
+              document.getElementById("contact-form") as HTMLFormElement
+            );
+            console.log("Form data:", formData);
+            formData.delete("file");
+            formData.append("fileName", file?.name || "");
+            formData.append("fileType", file?.type || "");
+            formData.append("fileSize", file?.size || -1);
+            console.log("Form data:", formData);
+            fetcher.submit(formData, { method: "post" });
+          }}
+        >
+          Save
+        </button>
         <button
           onClick={async () => {
             fetcher.submit(
