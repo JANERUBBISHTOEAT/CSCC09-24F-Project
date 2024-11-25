@@ -84,6 +84,7 @@ export default function File() {
 
         <div>
           <Form action="edit">
+            {/* TODO: Make buttons more descriptive (use seed etc.) */}
             <button type="submit">Edit</button>
           </Form>
 
