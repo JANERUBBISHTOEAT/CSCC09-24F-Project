@@ -45,7 +45,7 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
     return json({
       token: token,
       magnet: formObj.magnet,
-      intent: "acquireMagnet",
+      intent: "acquireToken",
     });
   }
 
@@ -64,7 +64,7 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
     return json({
       magnet: magnet,
       token: formObj.token,
-      intent: "acquireToken",
+      intent: "acquireMagnet",
     });
   }
 };
