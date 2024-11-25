@@ -54,9 +54,9 @@ export default function File() {
           key={file.magnet}
           // src={file.magnet}
           className={
-            (file && file.type
-              ? fileIconMap[file.type]
-              : "fas fa-file-question") + " fa-2x file-icon"
+            (file
+              ? fileIconMap[file.type ?? "default"] || "fas fa-file"
+              : "fas fa-file-upload") + " fa-2x file-icon"
           }
         ></i>
       </div>
