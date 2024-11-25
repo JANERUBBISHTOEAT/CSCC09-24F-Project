@@ -8,6 +8,8 @@ import Swal from "sweetalert2";
 import invariant from "tiny-invariant";
 import toastr from "toastr";
 import { mergeFiles } from "~/utils/data.server";
+import { prettyBytes } from "~/utils/functions";
+import HashMap from "~/utils/hashmap.server";
 import {
   commitSession,
   destroySession,
@@ -15,8 +17,6 @@ import {
   getUserSession,
   getVisitorSession,
 } from "~/utils/session.server";
-import { prettyBytes } from "~/utils/functions";
-import HashMap from "~/utils/hashmap.server";
 
 if (typeof window === "undefined") {
   // Server-side
@@ -123,6 +123,19 @@ export default function Index() {
       clearTimeout(debounceTimeout.current);
     }
 
+    // Clear input CSS
+    const token_elem = document.getElementsByName(
+      "token"
+    )[0] as HTMLInputElement;
+    const magnet_elem = document.getElementsByName(
+      "magnet"
+    )[0] as HTMLInputElement;
+
+    token_elem.className = "";
+    void token_elem.offsetWidth;
+    magnet_elem.className = "";
+    void token_elem.offsetWidth;
+
     debounceTimeout.current = setTimeout(() => {
       handleDownload(value, type);
     }, 500);
@@ -193,32 +206,37 @@ export default function Index() {
       return;
     }
 
+    const token_elem = document.getElementsByName(
+      "token"
+    )[0] as HTMLInputElement;
+    const magnet_elem = document.getElementsByName(
+      "magnet"
+    )[0] as HTMLInputElement;
+
     // [x] Acquire magnet link & save to history
     if (!fetcher.data.magnet && fetcher.data.intent === "acquireMagnet") {
       console.error("No magnet link found");
-      Swal.fire({
-        icon: "error",
-        title: "No magnet link found",
-        text: "Please try again later",
-        showConfirmButton: false,
-        timer: 2500,
-        timerProgressBar: true,
-      });
+      token_elem.className = "";
+      void token_elem.offsetWidth;
+      token_elem.classList.add("wrong-input");
       return;
+    } else {
+      token_elem.className = "";
+      void token_elem.offsetWidth;
+      token_elem.classList.add("correct-input");
     }
 
     // [ ] Untested download by magnet link
     if (!fetcher.data.token && fetcher.data.intent === "acquireToken") {
       console.error("No token found");
-      Swal.fire({
-        icon: "warning",
-        title: "Token failed",
-        text: "But you can still download using magnet link",
-        showConfirmButton: false,
-        timer: 2500,
-        timerProgressBar: true,
-      });
+      magnet_elem.className = "";
+      void token_elem.offsetWidth;
+      magnet_elem.classList.add("wrong-input");
       // return;
+    } else {
+      magnet_elem.className = "";
+      void token_elem.offsetWidth;
+      magnet_elem.classList.add("correct-input");
     }
 
     const magnet = fetcher.data.magnet;
@@ -306,6 +324,7 @@ export default function Index() {
   return (
     <div id="index-page">
       <div className="">
+        {/* TODO: Make a soft warning here not Swal */}
         <p>Download using your token:</p>
         <input
           type="text"
