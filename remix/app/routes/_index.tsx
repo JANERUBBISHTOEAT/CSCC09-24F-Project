@@ -102,6 +102,7 @@ export default function Index() {
   }>();
   const [loggedIn, setLoggedIn] = useState(initialUser ? true : false);
   const [user, setUser] = useState<Record<string, any> | null>(null);
+  const debounceTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   async function loadModule() {
     console.log("Loading WebTorrent module");
@@ -116,6 +117,16 @@ export default function Index() {
   useEffect(() => {
     loadModule();
   }, []);
+
+  const debounce = (value: string, type: string) => {
+    if (debounceTimeout.current) {
+      clearTimeout(debounceTimeout.current);
+    }
+
+    debounceTimeout.current = setTimeout(() => {
+      handleDownload(value, type);
+    }, 500);
+  };
 
   const handleDownload = async (magnet_or_token: string, type: string) => {
     invariant(magnet_or_token, "No magnet link provided");
@@ -301,7 +312,7 @@ export default function Index() {
           name="token"
           title="Token"
           onChange={(e) => {
-            handleDownload(e.target.value, "token");
+            debounce(e.target.value, "token");
           }}
           id="fileInput"
         />
@@ -314,7 +325,7 @@ export default function Index() {
           name="magnet"
           title="Magnet link"
           onChange={(e) => {
-            handleDownload(e.target.value, "magnet");
+            debounce(e.target.value, "magnet");
           }}
           id="fileInput"
         />
