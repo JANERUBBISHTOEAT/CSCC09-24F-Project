@@ -4,6 +4,7 @@ import { useFetcher, useLoaderData, useLocation } from "@remix-run/react";
 import dotenv from "dotenv";
 import { jwtDecode } from "jwt-decode";
 import { useEffect, useRef, useState } from "react";
+import Swal from "sweetalert2";
 import invariant from "tiny-invariant";
 import toastr from "toastr";
 import { mergeFiles } from "~/utils/data.server";
@@ -14,7 +15,8 @@ import {
   getUserSession,
   getVisitorSession,
 } from "~/utils/session.server";
-import { prettyBytes } from "../utils/functions";
+import { prettyBytes } from "~/utils/functions";
+import HashMap from "~/utils/hashmap.server";
 
 if (typeof window === "undefined") {
   // Server-side
@@ -28,7 +30,6 @@ export const loader: LoaderFunction = async ({ request }) => {
 
 export const action = async ({ params, request }: ActionFunctionArgs) => {
   console.log("Action params:", params);
-  // Invariant check
 
   // Check intent
   const formData = await request.formData();
@@ -72,6 +73,15 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
       { headers: { "Set-Cookie": await destroySession(session) } }
     );
   }
+
+  // * Is acquireMagnet
+  if (formObj.intent === "acquireMagnet") {
+    console.log("intent: acquireMagnet");
+    const token = formObj.token as string;
+    const magnet = await HashMap.get(token);
+    console.log("Magnet:", magnet);
+    return json({ magnet: magnet });
+  }
 };
 
 export default function Index() {
@@ -86,6 +96,9 @@ export default function Index() {
   const fetcher = useFetcher<{
     googleClientId: string;
     user: Record<string, any>;
+    magnet?: string;
+    token?: string;
+    intent?: string;
   }>();
   const [loggedIn, setLoggedIn] = useState(initialUser ? true : false);
   const [user, setUser] = useState<Record<string, any> | null>(null);
@@ -107,9 +120,8 @@ export default function Index() {
   const handleDownload = async (magnet_or_token: string, type: string) => {
     invariant(magnet_or_token, "No magnet link provided");
 
-    // TODO: Add token download
-
-    if (!clientRef.current || !magnet_or_token) {
+    // Load module if not ready
+    if (!clientRef.current) {
       Swal.fire({
         icon: "error",
         title: "Client not ready",
@@ -123,7 +135,83 @@ export default function Index() {
       return;
     }
 
-    clientRef.current.add(magnet_or_token, async (torrent: any) => {
+    // Get magnet link if token
+    // ! Cannot get response here, use useEffect in Index()
+    if (type === "token") {
+      // * Is token, get magnet link & save to history
+      console.log("Downloading using token:", magnet_or_token);
+      // Fetch magnet link
+      const formData = new FormData();
+      formData.append("intent", "acquireMagnet");
+      formData.append("token", magnet_or_token);
+      fetcher.submit(formData, {
+        method: "POST",
+        action: "/api/" + "new" + "/token",
+      });
+    } else {
+      // * Is magnet, get token & save to history
+      console.log("Downloading using magnet:", magnet_or_token);
+      const formData = new FormData();
+      formData.append("intent", "acquireToken");
+      formData.append("token", magnet_or_token);
+      fetcher.submit(formData, {
+        method: "POST",
+        action: "/api/" + "new" + "/token",
+      });
+    }
+  };
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const message = params.get("message");
+    if (message) {
+      toastr.warning(message);
+      window.history.replaceState({}, "", location.pathname);
+    }
+  }, [location]);
+
+  useEffect(() => {
+    if (!fetcher.data) {
+      console.error("No data found");
+      return;
+    }
+
+    // Acquire user data
+    if (fetcher.data.user) {
+      setUser(fetcher.data.user);
+      return;
+    }
+
+    // [x] Acquire magnet link & save to history
+    if (!fetcher.data.magnet && fetcher.data.intent === "acquireMagnet") {
+      console.error("No magnet link found");
+      Swal.fire({
+        icon: "error",
+        title: "No magnet link found",
+        text: "Please try again later",
+        showConfirmButton: false,
+        timer: 2500,
+        timerProgressBar: true,
+      });
+      return;
+    }
+
+    // [ ] Untested download by magnet link
+    if (!fetcher.data.token && fetcher.data.intent === "acquireToken") {
+      console.error("No token found");
+      Swal.fire({
+        icon: "warning",
+        title: "Token failed",
+        text: "But you can still download using magnet link",
+        showConfirmButton: false,
+        timer: 2500,
+        timerProgressBar: true,
+      });
+      // return;
+    }
+
+    const magnet = fetcher.data.magnet;
+    clientRef.current.add(magnet, async (torrent: any) => {
       console.log("Client is downloading:", torrent.infoHash);
       console.log("Torrent ready", torrent);
       clearTimeout(timeoutId);
@@ -173,21 +261,6 @@ export default function Index() {
       console.log("Download in progress, please wait...");
       toastr.info("Download in progress, please wait...");
     }, 1000);
-  };
-
-  useEffect(() => {
-    const params = new URLSearchParams(location.search);
-    const message = params.get("message");
-    if (message) {
-      toastr.warning(message);
-      window.history.replaceState({}, "", location.pathname);
-    }
-  }, [location]);
-
-  useEffect(() => {
-    if (fetcher.data?.user) {
-      setUser(fetcher.data.user);
-    }
   }, [fetcher.data]);
 
   const handleLogin = (credentialResponse: any) => {

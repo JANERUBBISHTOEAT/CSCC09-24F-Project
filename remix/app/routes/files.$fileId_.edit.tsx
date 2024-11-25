@@ -31,21 +31,6 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
   const formObj = Object.fromEntries(formData);
   console.log("formObj:", formObj);
 
-  // * Is torrent callback
-  if (formObj.intent === "acquireToken") {
-    console.log("intent: acquireToken");
-    // No magnet provided, return
-    if (!formObj.magnet) {
-      return json({ token: "" });
-    }
-
-    // Generate & save token
-    const token = await HashMap.genToken(formObj.magnet as string);
-    console.log("Token:", token);
-
-    return json({ token: token });
-  }
-
   // Get file which is gonna use anyway
   const user = await getUserSession(request);
   const visitor = await getVisitorSession(request);
@@ -153,7 +138,7 @@ export default function EditFile() {
       formData.append("magnet", torrent.magnetURI);
       fetcher.submit(formData, {
         method: "POST",
-        action: ".",
+        action: "/api/" + dbFileJson.id + "/token",
       });
 
       Swal.fire({
