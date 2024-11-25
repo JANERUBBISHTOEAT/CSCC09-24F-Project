@@ -33,8 +33,8 @@ export type FileRecord = FileMutation & {
 
 const userFilesKey = (userId: string) => `user:${userId}:files`;
 
-// TODO: Rename
-const fakeFiles = {
+// [x]: Rename
+const fileService = {
   async getAll(userId: string): Promise<FileRecord[]> {
     const keys = await redis.hkeys(userFilesKey(userId));
     const files = await Promise.all(
@@ -50,7 +50,7 @@ const fakeFiles = {
 
   async create(userId: string, values: FileMutation): Promise<FileRecord> {
     // * Deduplicate here as `.create` should be duplicate-free
-    const duplicateFile = await fakeFiles.get_dup(userId, values);
+    const duplicateFile = await fileService.get_dup(userId, values);
 
     if (duplicateFile) {
       console.log("Duplicate file found:", duplicateFile.id);
@@ -75,7 +75,7 @@ const fakeFiles = {
     userId: string,
     values: FileMutation
   ): Promise<FileRecord | null> {
-    const files = await fakeFiles.getAll(userId);
+    const files = await fileService.getAll(userId);
     if (!values) return null; // No values to compare
     const duplicateFile = files.find(
       (file) =>
@@ -89,7 +89,7 @@ const fakeFiles = {
     id: string,
     values: FileMutation
   ): Promise<FileRecord> {
-    const file = await fakeFiles.get(userId, id);
+    const file = await fileService.get(userId, id);
     invariant(file, `No file found for ${id}`);
 
     const updatedFile = { ...file, ...values };
@@ -109,7 +109,7 @@ const fakeFiles = {
 };
 
 export async function getFiles(userId: string, query?: string | null) {
-  let files = await fakeFiles.getAll(userId);
+  let files = await fileService.getAll(userId);
   if (query) {
     files = matchSorter(files, query, {
       keys: ["filename", "token"],
@@ -120,12 +120,12 @@ export async function getFiles(userId: string, query?: string | null) {
 
 export async function createEmptyFile(userId: string) {
   // Only owner can create file
-  const file = await fakeFiles.create(userId, { owner: true });
+  const file = await fileService.create(userId, { owner: true });
   return file;
 }
 
 export async function getFile(userId: string, id: string) {
-  return fakeFiles.get(userId, id);
+  return fileService.get(userId, id);
 }
 
 export async function updateFile(
@@ -133,21 +133,24 @@ export async function updateFile(
   fileId: string,
   updates: FileMutation
 ) {
-  const file = await fakeFiles.get(userId, fileId);
+  const file = await fileService.get(userId, fileId);
   if (!file) {
     throw new Error(`No file found for ${fileId}`);
   }
   // * Deduplicate here as `.set` has other use cases
-  const duplicateFile = await fakeFiles.get_dup(userId, updates);
+  const duplicateFile = await fileService.get_dup(userId, updates);
   if (duplicateFile) {
     return file; // Do not update, return existing file
   }
-  const ret_file = await fakeFiles.set(userId, fileId, { ...file, ...updates });
+  const ret_file = await fileService.set(userId, fileId, {
+    ...file,
+    ...updates,
+  });
   return ret_file;
 }
 
 export async function deleteFile(userId: string, id: string) {
-  await fakeFiles.destroy(userId, id);
+  await fileService.destroy(userId, id);
 }
 
 // Merge visitor files to existing user files
@@ -155,9 +158,11 @@ export async function mergeFiles(
   userId: string,
   visitorId: string
 ): Promise<FileRecord[]> {
-  const visitorFiles = await fakeFiles.getAll(visitorId);
+  const visitorFiles = await fileService.getAll(visitorId);
   console.log("Merging", visitorFiles.length, "files from", visitorId);
-  await Promise.all(visitorFiles.map((file) => fakeFiles.create(userId, file)));
+  await Promise.all(
+    visitorFiles.map((file) => fileService.create(userId, file))
+  );
   await redis.del(userFilesKey(visitorId));
-  return fakeFiles.getAll(userId);
+  return fileService.getAll(userId);
 }
