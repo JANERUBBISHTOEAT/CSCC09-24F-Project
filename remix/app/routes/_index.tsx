@@ -104,10 +104,12 @@ export default function Index() {
     loadModule();
   }, []);
 
-  const handleDownload = async (magnet: string) => {
-    invariant(magnet, "No magnet link provided");
+  const handleDownload = async (magnet_or_token: string, type: string) => {
+    invariant(magnet_or_token, "No magnet link provided");
 
-    if (!clientRef.current || !magnet) {
+    // TODO: Add token download
+
+    if (!clientRef.current || !magnet_or_token) {
       Swal.fire({
         icon: "error",
         title: "Client not ready",
@@ -121,7 +123,7 @@ export default function Index() {
       return;
     }
 
-    clientRef.current.add(magnet, async (torrent: any) => {
+    clientRef.current.add(magnet_or_token, async (torrent: any) => {
       console.log("Client is downloading:", torrent.infoHash);
       console.log("Torrent ready", torrent);
       clearTimeout(timeoutId);
@@ -219,16 +221,32 @@ export default function Index() {
 
   return (
     <div id="index-page">
-      <p>Download using magnet link:</p>
-      <input
-        type="text"
-        name="magnet"
-        title="Magnet link"
-        onChange={(e) => {
-          handleDownload(e.target.value);
-        }}
-        id="fileInput"
-      />
+      <div className="">
+        <p>Download using your token:</p>
+        <input
+          type="text"
+          name="token"
+          title="Token"
+          onChange={(e) => {
+            handleDownload(e.target.value, "token");
+          }}
+          id="fileInput"
+        />
+      </div>
+
+      <div className="hidden">
+        <p>Download using magnet link:</p>
+        <input
+          type="text"
+          name="magnet"
+          title="Magnet link"
+          onChange={(e) => {
+            handleDownload(e.target.value, "magnet");
+          }}
+          id="fileInput"
+        />
+      </div>
+
       <div id="progress"></div>
       <div id="down_speed"></div>
       <div id="up_speed"></div>
