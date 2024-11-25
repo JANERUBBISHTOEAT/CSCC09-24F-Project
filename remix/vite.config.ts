@@ -2,11 +2,17 @@ import { vitePlugin as remix } from "@remix-run/dev";
 import { fileURLToPath } from "url";
 import { defineConfig } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
+import dotenv from "dotenv";
+
+dotenv.config();
+const isProduction = process.env.NODE_ENV === "production";
 
 export default defineConfig({
-  esbuild: {
-    drop: ["console", "debugger"],
-  },
+  esbuild: isProduction
+    ? {
+        drop: ["console", "debugger"],
+      }
+    : {},
   plugins: [
     remix({
       ignoredRouteFiles: ["**/*.css"],
