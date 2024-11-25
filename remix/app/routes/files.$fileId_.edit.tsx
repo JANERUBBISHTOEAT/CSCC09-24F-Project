@@ -15,7 +15,7 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   const user = await getUserSession(request);
   const visitor = await getVisitorSession(request);
   const file = await getFile(user?.sub || visitor?.sub, params.fileId);
-  console.log("File:", file);
+  console.log("File @loader:", file);
   if (!file) {
     return redirect("/?message=Page+Not+Found");
   }
@@ -54,7 +54,7 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
     redirect("/?message=Page+Not+Found");
     throw new Response("Not Found", { status: 404 });
   }
-  console.log("File:", file);
+  console.log("File @action:", file);
 
   // * is human cancel submission
   if (formObj.intent === "cancelSubmission") {
@@ -124,6 +124,7 @@ export default function EditFile() {
   }, []);
 
   const handleSubmit = (files: FileList | null) => {
+    // TODO: Update element (should modify element || order)
     invariant(files, "No file selected");
     if (!clientRef.current || !files) {
       Swal.fire({
@@ -257,15 +258,15 @@ export default function EditFile() {
         <span>Name</span>
         <input
           aria-label="Filename"
-          name="filename"
-          defaultValue={dbFileJson.filename || file?.name || ""}
+          name="fileName"
+          value={dbFileJson.filename || file?.name || ""}
           placeholder="Filename"
           type="text"
         />
         <input
           aria-label="Token"
           name="token"
-          defaultValue={dbFileJson.token || token || ""}
+          value={dbFileJson.token || token || ""}
           placeholder="Token"
           type="text"
           disabled
@@ -277,7 +278,7 @@ export default function EditFile() {
       <label>
         <span>Share with</span>
         <input
-          defaultValue={dbFileJson.notes || ""}
+          value={dbFileJson.notes || ""}
           name="notes"
           placeholder="TODO"
           type="text"
@@ -288,7 +289,7 @@ export default function EditFile() {
         <span>File Link</span>
         <input
           name="_magnet"
-          defaultValue={dbFileJson.magnet || torrent?.magnetURI || ""}
+          value={dbFileJson.magnet || torrent?.magnetURI || ""}
           placeholder="magnet:?"
           type="text"
           // type="password"
@@ -307,30 +308,10 @@ export default function EditFile() {
       </label>
       <label>
         <span>Notes</span>
-        <textarea defaultValue={dbFileJson.notes || ""} name="notes" rows={6} />
+        <textarea value={dbFileJson.notes || ""} name="notes" rows={6} />
       </label>
       <p>
-        <button
-          type="submit"
-          onClick={async (event) => {
-            event.preventDefault();
-
-            // Remove file from request then submit
-            // * File do not go to server
-            const formData = new FormData(
-              document.getElementById("contact-form") as HTMLFormElement
-            );
-            console.log("Form data:", formData);
-            formData.delete("file");
-            formData.append("fileName", file?.name || "");
-            formData.append("fileType", file?.type || "");
-            formData.append("fileSize", file?.size || -1);
-            console.log("Form data:", formData);
-            fetcher.submit(formData, { method: "post" });
-          }}
-        >
-          Save
-        </button>
+        <button type="submit">Save</button>
         <button
           onClick={async () => {
             fetcher.submit(
