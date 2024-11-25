@@ -140,13 +140,13 @@ export async function updateFile(
   // * Deduplicate here as `.set` has other use cases
   const duplicateFile = await fileService.get_dup(userId, updates);
   if (duplicateFile) {
-    return file; // Do not update, return existing file
+    return duplicateFile; // Do not update, return existing file
   }
-  const ret_file = await fileService.set(userId, fileId, {
+  const newFile = await fileService.set(userId, fileId, {
     ...file,
     ...updates,
   });
-  return ret_file;
+  return newFile;
 }
 
 export async function deleteFile(userId: string, id: string) {
