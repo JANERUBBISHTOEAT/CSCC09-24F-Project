@@ -271,7 +271,7 @@ export default function Index() {
         peers_div.innerHTML = `Peers: ${torrent.numPeers}`;
       });
 
-      torrent.on("done", () => {
+      torrent.on("done", async () => {
         console.log("Download finished.");
         progress_div.innerHTML = `Progress: ${(100).toFixed(2)}%`;
 
@@ -283,6 +283,17 @@ export default function Index() {
           timer: 2500,
           timerProgressBar: true,
         });
+
+        for (const file of torrent.files) {
+          console.log("File:", file);
+          downloadTorrentFile(file);
+        }
+
+        // Clear input
+        token_elem.value = "";
+        magnet_elem.value = "";
+        token_elem.className = "";
+        magnet_elem.className = "";
       });
     });
 
@@ -291,6 +302,20 @@ export default function Index() {
       toastr.info("Download in progress, please wait...");
     }, 1000);
   }, [fetcher.data]);
+
+  async function downloadTorrentFile(file: any) {
+    const blob = await file.blob();
+    console.log("Blob:", blob);
+    const url = URL.createObjectURL(blob);
+
+    const index_elem = document.getElementById("index-page") as HTMLElement;
+    const a = document.createElement("a");
+    a.href = url;
+    a.innerText = "Download file" + file.name;
+    a.download = file.name;
+    a.click();
+    index_elem.appendChild(a);
+  }
 
   const handleLogin = (credentialResponse: any) => {
     fetcher.load(".");

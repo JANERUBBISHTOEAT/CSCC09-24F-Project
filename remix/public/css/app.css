@@ -471,7 +471,7 @@ i {
 .wrong-input {
   border: 1px solid red;
   outline: none;
-  animation: pulse-red 0.5s 1 ease-out;
+  animation: pulse-red 0.2s 1 ease-out;
 }
 @keyframes pulse-red {
   0% {
@@ -488,7 +488,7 @@ i {
 .correct-input {
   border: 1px solid green;
   outline: none;
-  animation: pulse-green 1.5s 1 ease-out;
+  animation: pulse-green 3s infinite ease-in-out;
 }
 @keyframes pulse-green {
   0% {
