@@ -92,7 +92,7 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
   const newFile = await updateFile(
     user?.sub || visitor?.sub,
     params.fileId,
-    updates
+    updates as any
   );
   // [x]: Update token element
   return redirect(`/files/${newFile.id}/?message=File+saved`);
@@ -310,6 +310,19 @@ export default function EditFile() {
         <span>Notes</span>
         <textarea value={dbFileJson.notes || ""} name="notes" rows={6} />
       </label>
+      <input
+        type="hidden"
+        name="fileType"
+        value={dbFileJson.type || file?.type || ""}
+        readOnly
+      />
+      <input
+        type="hidden"
+        name="fileSize"
+        value={dbFileJson.size || file?.size || -1}
+        readOnly
+      />
+
       <p>
         <button type="submit">Save</button>
         <button
