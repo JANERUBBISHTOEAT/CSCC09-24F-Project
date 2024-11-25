@@ -124,7 +124,7 @@ export default function EditFile() {
   }, []);
 
   const handleSubmit = (files: FileList | null) => {
-    // TODO: Update element (should modify element || order)
+    // [x]: Update element (should modify element || order)
     invariant(files, "No file selected");
     if (!clientRef.current || !files) {
       Swal.fire({
@@ -213,7 +213,7 @@ export default function EditFile() {
       key={dbFileJson.id}
       id="contact-form"
       method="post"
-      encType="multipart/form-data"
+      // encType="multipart/form-data"
     >
       <div
         id="dropzone"
@@ -259,14 +259,14 @@ export default function EditFile() {
         <input
           aria-label="Filename"
           name="fileName"
-          value={dbFileJson.filename || file?.name || ""}
+          value={file?.name || dbFileJson.filename || ""}
           placeholder="Filename"
           type="text"
         />
         <input
           aria-label="Token"
           name="token"
-          value={dbFileJson.token || token || ""}
+          value={token || dbFileJson.token || ""}
           placeholder="Token"
           type="text"
           disabled
@@ -289,7 +289,7 @@ export default function EditFile() {
         <span>File Link</span>
         <input
           name="_magnet"
-          value={dbFileJson.magnet || torrent?.magnetURI || ""}
+          value={torrent?.magnetURI || dbFileJson.magnet || ""}
           placeholder="magnet:?"
           type="text"
           // type="password"
@@ -299,7 +299,7 @@ export default function EditFile() {
           className="hidden"
           type="text"
           name="magnet"
-          value={dbFileJson.magnet || torrent?.magnetURI || ""}
+          value={torrent?.magnetURI || dbFileJson.magnet || ""}
           readOnly
         />
         <button id="copy-magnet" type="button" onClick={handleCopy}>
@@ -313,13 +313,13 @@ export default function EditFile() {
       <input
         type="hidden"
         name="fileType"
-        value={dbFileJson.type || file?.type || ""}
+        value={file?.type || dbFileJson.type || ""}
         readOnly
       />
       <input
         type="hidden"
         name="fileSize"
-        value={dbFileJson.size || file?.size || -1}
+        value={file?.size || dbFileJson.size || -1}
         readOnly
       />
 

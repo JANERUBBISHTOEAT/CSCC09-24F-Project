@@ -33,6 +33,7 @@ export type FileRecord = FileMutation & {
 
 const userFilesKey = (userId: string) => `user:${userId}:files`;
 
+// TODO: Rename
 const fakeFiles = {
   async getAll(userId: string): Promise<FileRecord[]> {
     const keys = await redis.hkeys(userFilesKey(userId));
@@ -48,12 +49,8 @@ const fakeFiles = {
   },
 
   async create(userId: string, values: FileMutation): Promise<FileRecord> {
-    // Check duplicate file (happens when merging visitor profile)
-    const files = await fakeFiles.getAll(userId);
-    const duplicateFile = files.find(
-      (file) =>
-        file.magnet === values.magnet && file.filename === values.filename
-    );
+    // * Deduplicate here as `.create` should be duplicate-free
+    const duplicateFile = await fakeFiles.get_dup(userId, values);
 
     if (duplicateFile) {
       console.log("Duplicate file found:", duplicateFile.id);
@@ -74,6 +71,19 @@ const fakeFiles = {
     return newFile;
   },
 
+  async get_dup(
+    userId: string,
+    values: FileMutation
+  ): Promise<FileRecord | null> {
+    const files = await fakeFiles.getAll(userId);
+    if (!values) return null; // No values to compare
+    const duplicateFile = files.find(
+      (file) =>
+        file.magnet === values.magnet && file.filename === values.filename
+    );
+    return duplicateFile || null;
+  },
+
   async set(
     userId: string,
     id: string,
@@ -81,20 +91,6 @@ const fakeFiles = {
   ): Promise<FileRecord> {
     const file = await fakeFiles.get(userId, id);
     invariant(file, `No file found for ${id}`);
-
-    // Check duplicate file (happens when manually adding dup)
-    const files = await fakeFiles.getAll(userId);
-    const duplicateFile = files.find(
-      (file) =>
-        file.magnet === values.magnet && file.filename === values.filename
-    );
-
-    if (duplicateFile) {
-      console.log("Duplicate file found:", duplicateFile.id);
-      // Delete this file, return existing file
-      await fakeFiles.destroy(userId, id);
-      return duplicateFile;
-    }
 
     const updatedFile = { ...file, ...values };
     if (updatedFile.magnet) {
@@ -134,14 +130,19 @@ export async function getFile(userId: string, id: string) {
 
 export async function updateFile(
   userId: string,
-  id: string,
+  fileId: string,
   updates: FileMutation
 ) {
-  const file = await fakeFiles.get(userId, id);
+  const file = await fakeFiles.get(userId, fileId);
   if (!file) {
-    throw new Error(`No file found for ${id}`);
+    throw new Error(`No file found for ${fileId}`);
   }
-  const ret_file = await fakeFiles.set(userId, id, { ...file, ...updates });
+  // * Deduplicate here as `.set` has other use cases
+  const duplicateFile = await fakeFiles.get_dup(userId, updates);
+  if (duplicateFile) {
+    return file; // Do not update, return existing file
+  }
+  const ret_file = await fakeFiles.set(userId, fileId, { ...file, ...updates });
   return ret_file;
 }
 
