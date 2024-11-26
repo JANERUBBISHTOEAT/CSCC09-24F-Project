@@ -60,6 +60,10 @@ button:active {
   display: flex;
   align-items: flex-start;
   gap: 1rem;
+  padding: 5px;
+}
+#contact p {
+  padding: 5px;
 }
 #contact h1 form {
   display: flex;

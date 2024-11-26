@@ -10,6 +10,7 @@ import { fileIconMap } from "~/utils/constants";
 import type { FileRecord } from "~/utils/data.server";
 import { getFile, updateFile } from "~/utils/data.server";
 import { getUserSession, getVisitorSession } from "~/utils/session.server";
+import { prettyBytes } from "~/utils/functions";
 
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   invariant(params.fileId, "Missing fileId param");
@@ -73,18 +74,18 @@ export default function File() {
           <Favorite file={file} />
         </h1>
 
+        <p></p>
+
         {0 && file.notes ? (
           <p>
             Shared with <a href={`/users/${file.notes}`}>{file.notes}</a>
           </p>
         ) : null}
-
+        {file.size ? <p>Size: {prettyBytes(file.size)}</p> : null}
         {file.notes ? (
-          <div>
-            <p></p>
-            <p>Notes:</p>
-            <p>{file.notes}</p>
-          </div>
+          <>
+            <p>Notes: {file.notes}</p>
+          </>
         ) : null}
 
         <div>
