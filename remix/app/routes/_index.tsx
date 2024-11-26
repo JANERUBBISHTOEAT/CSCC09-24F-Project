@@ -17,40 +17,15 @@ import {
   getUserSession,
   getVisitorSession,
 } from "~/utils/session.server";
-import { createCookie } from "@remix-run/node";
 
 if (typeof window === "undefined") {
   // Server-side
   dotenv.config();
 }
-const easterEggCookie = createCookie("logged-in", {
-  maxAge: 60,
-  path: "/",
-});
-async function createEggCookie(v: string) {
-  return await easterEggCookie.serialize(v);
-}
 
 export const loader: LoaderFunction = async ({ request }) => {
   const user = await getUserSession(request);
-  let newCookieValue = user ? "true" : "false";
-
-  // Get log-in cookie
-  const cookieHeader = request.headers.get("Cookie");
-  const cookieValue = await easterEggCookie.parse(cookieHeader);
-  console.log("Cookie value:", cookieValue);
-  if (cookieValue && cookieValue !== newCookieValue.toString()) {
-    newCookieValue = "doesn't matter. serve every customer equally";
-  }
-
-  return json(
-    { googleClientId: process.env.GOOGLE_CLIENT_ID, user: user },
-    {
-      headers: {
-        "Set-Cookie": await createEggCookie(newCookieValue),
-      },
-    }
-  );
+  return json({ googleClientId: process.env.GOOGLE_CLIENT_ID, user: user });
 };
 
 export const action = async ({ params, request }: ActionFunctionArgs) => {
@@ -84,12 +59,7 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
 
     return json(
       { user: decoded },
-      {
-        headers: {
-          "Set-Cookie":
-            (await commitSession(session)) + (await createEggCookie("true")),
-        },
-      }
+      { headers: { "Set-Cookie": await commitSession(session) } }
     );
   }
 
@@ -100,12 +70,7 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
 
     return json(
       { user: null },
-      {
-        headers: {
-          "Set-Cookie":
-            (await destroySession(session)) + (await createEggCookie("false")),
-        },
-      }
+      { headers: { "Set-Cookie": await destroySession(session) } }
     );
   }
 
