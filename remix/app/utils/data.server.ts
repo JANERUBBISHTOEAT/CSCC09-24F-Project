@@ -140,7 +140,11 @@ export async function updateFile(
   // * Deduplicate here as `.set` has other use cases
   const duplicateFile = await fileService.get_dup(userId, updates);
   if (duplicateFile) {
-    return duplicateFile; // Do not update, return existing file
+    if (duplicateFile.notes === updates.notes) {
+      // Do not create, return existing file
+      console.log("Duplicate file found:", duplicateFile.id);
+      return duplicateFile;
+    }
   }
   const newFile = await fileService.set(userId, fileId, {
     ...file,
