@@ -134,7 +134,7 @@ export async function updateFile(
   fileId: string,
   updates: FileMutation,
   force: boolean = false,
-  allowDelete: boolean = true
+  allowDelete: boolean = false
 ) {
   const file = await fileService.get(userId, fileId);
 
