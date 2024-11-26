@@ -118,9 +118,9 @@ export async function getFiles(userId: string, query?: string | null) {
   return orderBy(files, "createdAt", "desc");
 }
 
-export async function createEmptyFile(userId: string) {
+export async function createEmptyFile(userId: string, owner: boolean = true) {
   // Only owner can create file
-  const file = await fileService.create(userId, { owner: true });
+  const file = await fileService.create(userId, { owner: owner });
   return file;
 }
 

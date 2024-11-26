@@ -96,7 +96,7 @@ async function createReceiveFile(
   // Create new file
   const sub = user?.sub || visitor?.sub;
   console.log("sub:", sub);
-  const newFile = await createEmptyFile(sub);
+  const newFile = await createEmptyFile(sub, false);
   updateFile(sub, newFile.id, {
     filename: "New File",
     token: token,

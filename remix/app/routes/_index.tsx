@@ -233,7 +233,7 @@ export default function Index() {
       }
     }
 
-    // [ ] Untested download by magnet link
+    // [x] Untested download by magnet link
     else if (fetcher.data.intent === "acquireToken") {
       console.log("Acquiring token...");
       if (!fetcher.data.token) {
@@ -266,6 +266,7 @@ export default function Index() {
       const peers_div: any = document.getElementById("peers");
 
       torrent.on("ready", () => {
+        // [ ] Update file history (fileName, fileSize, ...)
         console.log("Download started.");
         progress_div.innerHTML = `Progress: ${(0).toFixed(2)}%`;
       });
