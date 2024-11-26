@@ -34,8 +34,8 @@ services:
 
   # Remix fullstack application
   remix:
-    # build: .
-    image: zheyuanwei/w2w
+    build: .
+    # image: zheyuanwei/w2w
     container_name: remix
     restart: always
     environment:
