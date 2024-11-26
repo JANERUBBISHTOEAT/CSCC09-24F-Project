@@ -46,6 +46,11 @@ export default function File() {
     }
   }, [location]);
 
+  const copyToken = (token: string) => async () => {
+    await navigator.clipboard.writeText(token);
+    toastr.success("Token copied to clipboard");
+  };
+
   const { file: file } = useLoaderData<typeof loader>();
   return (
     <div id="contact">
@@ -63,7 +68,7 @@ export default function File() {
       </div>
 
       <div>
-        <h1>
+        <h1 onClick={copyToken(file.token)}>
           {file.filename || file.token ? (
             <>
               {file.filename} #{file.token}
