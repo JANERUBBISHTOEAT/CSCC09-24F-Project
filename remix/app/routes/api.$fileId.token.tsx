@@ -2,6 +2,14 @@ import type { ActionFunctionArgs } from "@remix-run/node";
 import invariant from "tiny-invariant";
 import HashMap from "~/utils/hashmap.server";
 import { json, redirect } from "@remix-run/node";
+import {
+  commitSession,
+  destroySession,
+  getSession,
+  getUserSession,
+  getVisitorSession,
+} from "~/utils/session.server";
+import { createEmptyFile, updateFile } from "~/utils/data.server";
 
 export const action = async ({ params, request }: ActionFunctionArgs) => {
   console.log("Action params:", params);
@@ -18,11 +26,6 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
 
   // [ ] Add new file record if fileId="new"
   // Need to return both magnet and token
-
-  if (params.fileId === "new") {
-    console.log("intent: newFile");
-    // [ ] Create new file record
-  }
 
   // * Acquire token
   if (formObj.intent === "acquireToken") {
@@ -46,6 +49,9 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
     const token = await HashMap.genToken(formObj.magnet as string);
     console.log("Token:", token);
 
+    if (params.fileId === "new" && token)
+      createReceiveFile(request, token, formObj.magnet as string);
+
     return json({
       token: token,
       magnet: formObj.magnet,
@@ -65,6 +71,9 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
     const magnet = await HashMap.get(formObj.token as string);
     console.log("Magnet:", magnet);
 
+    if (params.fileId === "new" && magnet)
+      createReceiveFile(request, formObj.token as string, magnet);
+
     return json({
       magnet: magnet,
       token: formObj.token,
@@ -72,3 +81,26 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
     });
   }
 };
+
+async function createReceiveFile(
+  request: Request,
+  token: string,
+  magnet: string
+) {
+  console.log("intent: newFile");
+  const user = await getUserSession(request);
+  const visitor = await getVisitorSession(request);
+  console.log("User:", user);
+  console.log("Visitor:", visitor);
+
+  // Create new file
+  const sub = user?.sub || visitor?.sub;
+  console.log("sub:", sub);
+  const newFile = await createEmptyFile(sub);
+  updateFile(sub, newFile.id, {
+    filename: "New File",
+    token: token,
+    magnet: magnet,
+  });
+  return newFile;
+}
