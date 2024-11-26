@@ -110,6 +110,7 @@ const fileService = {
 
 export async function getFiles(userId: string, query?: string | null) {
   let files = await fileService.getAll(userId);
+
   if (query) {
     files = matchSorter(files, query, {
       keys: ["filename", "token"],
@@ -136,6 +137,7 @@ export async function updateFile(
   allowDelete: boolean = true
 ) {
   const file = await fileService.get(userId, fileId);
+
   if (!file) {
     throw new Error(`No file found for ${fileId}`);
   }

@@ -4,6 +4,7 @@ import invariant from "tiny-invariant";
 import { deleteFile } from "~/utils/data.server";
 import { getUserSession, getVisitorSession } from "~/utils/session.server";
 
+
 export const action = async ({ params, request }: ActionFunctionArgs) => {
   invariant(params.fileId, "Missing fileId param");
   const user = await getUserSession(request);
