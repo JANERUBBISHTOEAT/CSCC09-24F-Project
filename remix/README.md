@@ -15,15 +15,21 @@ This starts your app in development mode, rebuilding assets on file changes.
 
 ## Deployment
 
+Run docker-compose:
+
 ```sh
 docker-compose down
 docker-compose up -d --build
 ```
 
+Build and run docker image (deprecated, use docker-compose instead):
+
 ```sh
 docker build -t zheyuanwei/w2w .
 docker run --rm -p 3000:3000 --network="host" --pull=always zheyuanwei/w2w
 ```
+
+Clean up:
 
 ```sh
 docker stop $(docker ps -aq)

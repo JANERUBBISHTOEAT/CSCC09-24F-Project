@@ -54,8 +54,9 @@ export default function File() {
           key={file.magnet}
           // src={file.magnet}
           className={
-            (file ? fileIconMap[file.type] : "fas fa-file-question") +
-            " fa-2x file-icon"
+            (file
+              ? fileIconMap[file.type ?? "default"] || "fas fa-file"
+              : "fas fa-file-upload") + " fa-2x file-icon"
           }
         ></i>
       </div>
@@ -72,18 +73,24 @@ export default function File() {
           <Favorite file={file} />
         </h1>
 
-        {file.notes ? (
+        {0 && file.notes ? (
           <p>
-            Shared with
-            <a href={`https://twitter.com/${file.notes}`}>{file.notes}</a>
+            Shared with <a href={`/users/${file.notes}`}>{file.notes}</a>
           </p>
         ) : null}
 
-        {file.notes ? <p>{file.notes}</p> : null}
+        {file.notes ? (
+          <div>
+            <p></p>
+            <p>Notes:</p>
+            <p>{file.notes}</p>
+          </div>
+        ) : null}
 
         <div>
           <Form action="edit">
-            <button type="submit">Edit</button>
+            {/* [x]: Make buttons more descriptive (use seed etc.) */}
+            <button type="submit">Seed</button>
           </Form>
 
           <Form

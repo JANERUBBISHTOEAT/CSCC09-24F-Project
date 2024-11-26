@@ -1,3 +1,4 @@
+import "@fortawesome/fontawesome-free/css/all.min.css";
 import type { LinksFunction, LoaderFunctionArgs } from "@remix-run/node";
 import { ActionFunctionArgs, json, redirect } from "@remix-run/node";
 import {
@@ -14,6 +15,8 @@ import {
   useSubmit,
 } from "@remix-run/react";
 import { useEffect } from "react";
+import "sweetalert2/dist/sweetalert2.min.css";
+import "toastr/build/toastr.min.css";
 import { createEmptyFile, getFiles } from "~/utils/data.server";
 import {
   commitSession,
@@ -21,9 +24,6 @@ import {
   getUserSession,
   getVisitorSession,
 } from "./utils/session.server";
-import "sweetalert2/dist/sweetalert2.min.css";
-import "toastr/build/toastr.min.css";
-import "@fortawesome/fontawesome-free/css/all.min.css";
 
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: "/css/app.css" },

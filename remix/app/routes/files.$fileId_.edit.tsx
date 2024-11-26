@@ -15,7 +15,7 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   const user = await getUserSession(request);
   const visitor = await getVisitorSession(request);
   const file = await getFile(user?.sub || visitor?.sub, params.fileId);
-  console.log("File:", file);
+  console.log("File @loader:", file);
   if (!file) {
     return redirect("/?message=Page+Not+Found");
   }
@@ -31,21 +31,6 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
   const formObj = Object.fromEntries(formData);
   console.log("formObj:", formObj);
 
-  // * Is torrent callback
-  if (formObj.intent === "acquireToken") {
-    console.log("intent: acquireToken");
-    // No magnet provided, return
-    if (!formObj.magnet) {
-      return json({ token: "" });
-    }
-
-    // Generate & save token
-    const token = await HashMap.genToken(formObj.magnet as string);
-    console.log("Token:", token);
-
-    return json({ token: token });
-  }
-
   // Get file which is gonna use anyway
   const user = await getUserSession(request);
   const visitor = await getVisitorSession(request);
@@ -54,7 +39,7 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
     redirect("/?message=Page+Not+Found");
     throw new Response("Not Found", { status: 404 });
   }
-  console.log("File:", file);
+  console.log("File @action:", file);
 
   // * is human cancel submission
   if (formObj.intent === "cancelSubmission") {
@@ -73,19 +58,18 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
   console.log("intent: saveFile");
 
   // No file or link provided, delete this record
-  if (!formObj.file || !formObj.magnet) {
+  if (!formObj.fileName || !formObj.magnet) {
     deleteFile(user?.sub || visitor?.sub, params.fileId);
     return redirect("/?message=File+not+saved");
   }
 
   const updates = {
-    filename:
-      (formObj.file as File).name || file.filename || params.fileId || "",
-    type: (formObj.file as File).type || file.type || "",
-    size: (formObj.file as File).size || file.size || -1,
-    magnet: (formObj.magnet as string) || file.magnet || "",
-    token: (formObj.token as string) || file.token || "",
-    notes: (formObj.notes as string) || file.notes || "",
+    filename: formObj.fileName || file.filename || params.fileId || "",
+    type: formObj.fileType || file.type || "",
+    size: formObj.fileSize || file.size || -1,
+    magnet: formObj.magnet || file.magnet || "",
+    token: formObj.token || file.token || "",
+    notes: formObj.notes || file.notes || "",
   };
 
   console.log("Updates:", updates);
@@ -93,7 +77,7 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
   const newFile = await updateFile(
     user?.sub || visitor?.sub,
     params.fileId,
-    updates
+    updates as any
   );
   // [x]: Update token element
   return redirect(`/files/${newFile.id}/?message=File+saved`);
@@ -125,6 +109,7 @@ export default function EditFile() {
   }, []);
 
   const handleSubmit = (files: FileList | null) => {
+    // [x]: Update element (should modify element || order)
     invariant(files, "No file selected");
     if (!clientRef.current || !files) {
       Swal.fire({
@@ -153,7 +138,7 @@ export default function EditFile() {
       formData.append("magnet", torrent.magnetURI);
       fetcher.submit(formData, {
         method: "POST",
-        action: ".",
+        action: "/api/" + dbFileJson.id + "/token",
       });
 
       Swal.fire({
@@ -213,7 +198,7 @@ export default function EditFile() {
       key={dbFileJson.id}
       id="contact-form"
       method="post"
-      encType="multipart/form-data"
+      // encType="multipart/form-data"
     >
       <div
         id="dropzone"
@@ -258,48 +243,52 @@ export default function EditFile() {
         <span>Name</span>
         <input
           aria-label="Filename"
-          name="filename"
-          defaultValue={dbFileJson.filename || file?.name || ""}
+          name="fileName"
+          value={file?.name || dbFileJson.filename || ""}
           placeholder="Filename"
           type="text"
+          readOnly
         />
         <input
           aria-label="Token"
           name="token"
-          defaultValue={dbFileJson.token || token || ""}
+          value={token || dbFileJson.token || ""}
           placeholder="Token"
           type="text"
           disabled
+          readOnly
         />
         <button id="copy-token" type="button" onClick={handleCopy}>
           Copy
         </button>
       </p>
-      <label>
+      {/* <label className="hidden">
         <span>Share with</span>
         <input
           defaultValue={dbFileJson.notes || ""}
-          name="notes"
+          name="share"
           placeholder="TODO"
           type="text"
           disabled
+          readOnly
         />
-      </label>
+      </label> */}
       <label>
         <span>File Link</span>
         <input
           name="_magnet"
-          defaultValue={dbFileJson.magnet || torrent?.magnetURI || ""}
+          value={torrent?.magnetURI || dbFileJson.magnet || ""}
           placeholder="magnet:?"
           type="text"
           // type="password"
           disabled
+          readOnly
         />
         <input
           className="hidden"
           type="text"
           name="magnet"
-          value={dbFileJson.magnet || torrent?.magnetURI || ""}
+          value={torrent?.magnetURI || dbFileJson.magnet || ""}
           readOnly
         />
         <button id="copy-magnet" type="button" onClick={handleCopy}>
@@ -310,6 +299,19 @@ export default function EditFile() {
         <span>Notes</span>
         <textarea defaultValue={dbFileJson.notes || ""} name="notes" rows={6} />
       </label>
+      <input
+        type="hidden"
+        name="fileType"
+        value={file?.type || dbFileJson.type || ""}
+        readOnly
+      />
+      <input
+        type="hidden"
+        name="fileSize"
+        value={file?.size || dbFileJson.size || -1}
+        readOnly
+      />
+
       <p>
         <button type="submit">Save</button>
         <button
