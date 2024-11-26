@@ -96,6 +96,7 @@ export default function Index() {
   const fetcher = useFetcher<{
     googleClientId: string;
     user: Record<string, any>;
+    fileId?: string;
     magnet?: string;
     token?: string;
     intent?: string;
@@ -233,7 +234,7 @@ export default function Index() {
       }
     }
 
-    // [x] Untested download by magnet link
+    // [x] Tested download by magnet link
     else if (fetcher.data.intent === "acquireToken") {
       console.log("Acquiring token...");
       if (!fetcher.data.token) {
@@ -253,68 +254,81 @@ export default function Index() {
     }
 
     const magnet = fetcher.data.magnet;
-    clientRef.current.add(magnet, async (torrent: any) => {
-      console.log("Client is downloading:", torrent.infoHash);
-      console.log("Torrent ready", torrent);
-      clearTimeout(timeoutId);
-      setTorrent(torrent);
+    const torrent = clientRef.current.add(magnet);
+    console.log("Client is downloading:", torrent.infoHash);
+    console.log("Torrent ready", torrent);
+    if (debounceTimeout.current) {
+      clearTimeout(debounceTimeout.current);
+    }
+    setTorrent(torrent);
 
-      // Show progress bar
-      const progress_div: any = document.getElementById("progress");
-      const down_speed_div: any = document.getElementById("down_speed");
-      const up_speed_div: any = document.getElementById("up_speed");
-      const peers_div: any = document.getElementById("peers");
+    // Show progress bar
+    const progress_div: any = document.getElementById("progress");
+    const down_speed_div: any = document.getElementById("down_speed");
+    const up_speed_div: any = document.getElementById("up_speed");
+    const peers_div: any = document.getElementById("peers");
 
-      torrent.on("ready", () => {
-        // [ ] Update file history (fileName, fileSize, ...)
-        console.log("Download started.");
-        progress_div.innerHTML = `Progress: ${(0).toFixed(2)}%`;
-      });
-
-      torrent.on("download", (bytes: any) => {
-        console.log(`Progress: ${(torrent.progress * 100).toFixed(2)}%`);
-        progress_div.innerHTML = `Progress: ${(torrent.progress * 100).toFixed(
-          2
-        )}%`;
-        down_speed_div.innerHTML = `Download speed: ${prettyBytes(
-          torrent.downloadSpeed
-        )}/s`;
-        up_speed_div.innerHTML = `Upload speed: ${prettyBytes(
-          torrent.uploadSpeed
-        )}/s`;
-        peers_div.innerHTML = `Peers: ${torrent.numPeers}`;
-      });
-
-      torrent.on("done", async () => {
-        console.log("Download finished.");
-        progress_div.innerHTML = `Progress: ${(100).toFixed(2)}%`;
-        down_speed_div.innerHTML = "";
-        up_speed_div.innerHTML = "";
-        peers_div.innerHTML = "";
-
-        Swal.fire({
-          icon: "success",
-          title: "Download finished!",
-          text: "Your file is ready for use 🎉",
-          showConfirmButton: false,
-          timer: 2500,
-          timerProgressBar: true,
+    torrent.on("ready", () => {
+      console.log("Download started.");
+      progress_div.innerHTML = `Progress: ${(0).toFixed(2)}%`;
+      // [ ] Update file history (fileName, fileSize, ...)
+      if (fetcher.data?.fileId) {
+        const formData = new FormData();
+        formData.append("intent", "updateFile");
+        formData.append("fileId", fetcher.data.fileId);
+        formData.append("magnet", torrent.magnetURI);
+        formData.append("filename", torrent.name);
+        formData.append("filesize", torrent.length);
+        fetcher.submit(formData, {
+          method: "POST",
+          action: "/api/files",
         });
-
-        for (const file of torrent.files) {
-          console.log("File:", file);
-          downloadTorrentFile(file);
-        }
-
-        // Clear input
-        token_elem.value = "";
-        magnet_elem.value = "";
-        token_elem.className = "";
-        magnet_elem.className = "";
-      });
+      }
     });
 
-    const timeoutId = setTimeout(() => {
+    torrent.on("download", (bytes: any) => {
+      console.log(`Progress: ${(torrent.progress * 100).toFixed(2)}%`);
+      progress_div.innerHTML = `Progress: ${(torrent.progress * 100).toFixed(
+        2
+      )}%`;
+      down_speed_div.innerHTML = `Download speed: ${prettyBytes(
+        torrent.downloadSpeed
+      )}/s`;
+      up_speed_div.innerHTML = `Upload speed: ${prettyBytes(
+        torrent.uploadSpeed
+      )}/s`;
+      peers_div.innerHTML = `Peers: ${torrent.numPeers}`;
+    });
+
+    torrent.on("done", async () => {
+      console.log("Download finished.");
+      progress_div.innerHTML = `Progress: ${(100).toFixed(2)}%`;
+      down_speed_div.innerHTML = "";
+      up_speed_div.innerHTML = "";
+      peers_div.innerHTML = "";
+
+      Swal.fire({
+        icon: "success",
+        title: "Download finished!",
+        text: "Your file is ready for use 🎉",
+        showConfirmButton: false,
+        timer: 2500,
+        timerProgressBar: true,
+      });
+
+      for (const file of torrent.files) {
+        console.log("File:", file);
+        downloadTorrentFile(file);
+      }
+
+      // Clear input
+      token_elem.value = "";
+      magnet_elem.value = "";
+      token_elem.className = "";
+      magnet_elem.className = "";
+    });
+
+    debounceTimeout.current = setTimeout(() => {
       console.log("Download in progress, please wait...");
       toastr.info("Download in progress, please wait...");
     }, 1000);

@@ -1,15 +1,9 @@
 import type { ActionFunctionArgs } from "@remix-run/node";
+import { json } from "@remix-run/node";
 import invariant from "tiny-invariant";
-import HashMap from "~/utils/hashmap.server";
-import { json, redirect } from "@remix-run/node";
-import {
-  commitSession,
-  destroySession,
-  getSession,
-  getUserSession,
-  getVisitorSession,
-} from "~/utils/session.server";
 import { createEmptyFile, updateFile } from "~/utils/data.server";
+import HashMap from "~/utils/hashmap.server";
+import { getUserSession, getVisitorSession } from "~/utils/session.server";
 
 export const action = async ({ params, request }: ActionFunctionArgs) => {
   console.log("Action params:", params);
@@ -24,7 +18,7 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
   };
   console.log("formObj:", formObj);
 
-  // [ ] Add new file record if fileId="new"
+  // [x] Add new file record if fileId="new"
   // Need to return both magnet and token
 
   // * Acquire token
@@ -49,10 +43,16 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
     const token = await HashMap.genToken(formObj.magnet as string);
     console.log("Token:", token);
 
+    let newfile;
     if (params.fileId === "new" && token)
-      createReceiveFile(request, token, formObj.magnet as string);
+      newfile = await createReceiveFile(
+        request,
+        token,
+        formObj.magnet as string
+      );
 
     return json({
+      fileId: newfile?.id,
       token: token,
       magnet: formObj.magnet,
       intent: "acquireToken",
@@ -71,10 +71,16 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
     const magnet = await HashMap.get(formObj.token as string);
     console.log("Magnet:", magnet);
 
+    let newfile;
     if (params.fileId === "new" && magnet)
-      createReceiveFile(request, formObj.token as string, magnet);
+      newfile = await createReceiveFile(
+        request,
+        formObj.token as string,
+        magnet
+      );
 
     return json({
+      fileId: newfile?.id,
       magnet: magnet,
       token: formObj.token,
       intent: "acquireMagnet",
