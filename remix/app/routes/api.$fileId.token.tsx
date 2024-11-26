@@ -29,7 +29,11 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
     console.log("intent: acquireToken");
     // No magnet provided, return
     if (!formObj.magnet) {
-      return json({ token: "" });
+      return json({
+        token: "",
+        magnet: formObj.magnet,
+        intent: "acquireToken",
+      });
     }
 
     // Try get magnet first

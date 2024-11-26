@@ -131,9 +131,11 @@ export default function Index() {
       "magnetInput"
     ) as HTMLInputElement;
 
-    token_elem.className = "";
-    void token_elem.offsetWidth;
-    magnet_elem.className = "";
+    if (type === "token") {
+      token_elem.className = "";
+    } else {
+      magnet_elem.className = "";
+    }
     void token_elem.offsetWidth;
 
     debounceTimeout.current = setTimeout(() => {
@@ -177,7 +179,7 @@ export default function Index() {
       console.log("Downloading using magnet:", magnet_or_token);
       const formData = new FormData();
       formData.append("intent", "acquireToken");
-      formData.append("token", magnet_or_token);
+      formData.append("magnet", magnet_or_token);
       fetcher.submit(formData, {
         method: "POST",
         action: "/api/" + "new" + "/token",
@@ -200,6 +202,8 @@ export default function Index() {
       return;
     }
 
+    console.log("Fetcher data:", fetcher.data);
+
     // Acquire user data
     if (fetcher.data.user) {
       setUser(fetcher.data.user);
@@ -214,29 +218,38 @@ export default function Index() {
     ) as HTMLInputElement;
 
     // [x] Acquire magnet link & save to history
-    if (!fetcher.data.magnet && fetcher.data.intent === "acquireMagnet") {
-      console.error("No magnet link found");
-      token_elem.className = "";
-      void token_elem.offsetWidth;
-      token_elem.classList.add("wrong-input");
-      return;
-    } else {
-      token_elem.className = "";
-      void token_elem.offsetWidth;
-      token_elem.classList.add("correct-input");
+    if (fetcher.data.intent === "acquireMagnet") {
+      if (!fetcher.data.magnet) {
+        console.error("No magnet link found");
+        token_elem.className = "";
+        void token_elem.offsetWidth;
+        token_elem.classList.add("wrong-input");
+        return;
+      } else {
+        // Correct token
+        token_elem.className = "";
+        void token_elem.offsetWidth;
+        token_elem.classList.add("correct-input");
+      }
     }
 
     // [ ] Untested download by magnet link
-    if (!fetcher.data.token && fetcher.data.intent === "acquireToken") {
-      console.error("No token found");
-      magnet_elem.className = "";
-      void token_elem.offsetWidth;
-      magnet_elem.classList.add("wrong-input");
-      // return;
-    } else {
-      magnet_elem.className = "";
-      void token_elem.offsetWidth;
-      magnet_elem.classList.add("correct-input");
+    else if (fetcher.data.intent === "acquireToken") {
+      console.log("Acquiring token...");
+      if (!fetcher.data.token) {
+        console.error("No token found");
+        console.error("No token found");
+        magnet_elem.className = "";
+        void token_elem.offsetWidth;
+        magnet_elem.classList.add("wrong-input");
+        // return;
+      } else {
+        console.log("Token acquired:", fetcher.data.token);
+        // Pulse anyway
+        magnet_elem.className = "";
+        void token_elem.offsetWidth;
+        magnet_elem.classList.add("correct-input");
+      }
     }
 
     const magnet = fetcher.data.magnet;
@@ -274,6 +287,9 @@ export default function Index() {
       torrent.on("done", async () => {
         console.log("Download finished.");
         progress_div.innerHTML = `Progress: ${(100).toFixed(2)}%`;
+        down_speed_div.innerHTML = "";
+        up_speed_div.innerHTML = "";
+        peers_div.innerHTML = "";
 
         Swal.fire({
           icon: "success",
@@ -308,7 +324,7 @@ export default function Index() {
     console.log("Blob:", blob);
     const url = URL.createObjectURL(blob);
 
-    const index_elem = document.getElementById("index-page") as HTMLElement;
+    const index_elem = document.getElementById("fileList") as HTMLElement;
     const a = document.createElement("a");
     a.href = url;
     a.innerText = "Download file" + file.name;
@@ -379,6 +395,9 @@ export default function Index() {
       <div id="down_speed"></div>
       <div id="up_speed"></div>
       <div id="peers"></div>
+
+      <div id="fileList"></div>
+
       <div className="google-login-container">
         <div className={loggedIn ? "" : "hidden"}>
           <p>

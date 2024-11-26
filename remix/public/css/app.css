@@ -505,3 +505,7 @@ i {
     box-shadow: 0 0 0px green;
   }
 }
+
+#fileList {
+  margin: 10px;
+}
