@@ -198,7 +198,7 @@ export default function Index() {
   }, [location]);
 
   useEffect(() => {
-    if (!fetcher.data || !fetcher.data.user) {
+    if (!fetcher.data) {
       console.error("No data found");
       return;
     }
@@ -206,7 +206,7 @@ export default function Index() {
     console.log("Fetcher data:", fetcher.data);
 
     // Acquire user data
-    if (fetcher.data.user) {
+    if ("user" in fetcher.data) {
       setUser(fetcher.data.user);
       return;
     }
