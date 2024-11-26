@@ -124,12 +124,12 @@ export default function Index() {
     }
 
     // Clear input CSS
-    const token_elem = document.getElementsByName(
-      "token"
-    )[0] as HTMLInputElement;
-    const magnet_elem = document.getElementsByName(
-      "magnet"
-    )[0] as HTMLInputElement;
+    const token_elem = document.getElementById(
+      "tokenInput"
+    ) as HTMLInputElement;
+    const magnet_elem = document.getElementById(
+      "magnetInput"
+    ) as HTMLInputElement;
 
     token_elem.className = "";
     void token_elem.offsetWidth;
@@ -206,12 +206,12 @@ export default function Index() {
       return;
     }
 
-    const token_elem = document.getElementsByName(
-      "token"
-    )[0] as HTMLInputElement;
-    const magnet_elem = document.getElementsByName(
-      "magnet"
-    )[0] as HTMLInputElement;
+    const token_elem = document.getElementById(
+      "tokenInput"
+    ) as HTMLInputElement;
+    const magnet_elem = document.getElementById(
+      "magnetInput"
+    ) as HTMLInputElement;
 
     // [x] Acquire magnet link & save to history
     if (!fetcher.data.magnet && fetcher.data.intent === "acquireMagnet") {
@@ -349,7 +349,7 @@ export default function Index() {
   return (
     <div id="index-page">
       <div className="">
-        {/* TODO: Make a soft warning here not Swal */}
+        {/* [x]: Make a soft warning here not Swal */}
         <p>Download using your token:</p>
         <input
           type="text"
@@ -358,12 +358,12 @@ export default function Index() {
           onChange={(e) => {
             debounce(e.target.value, "token");
           }}
-          id="fileInput"
+          id="tokenInput"
         />
       </div>
 
-      <div className="hidden">
-        <p>Download using magnet link:</p>
+      <div className="">
+        <p>or using magnet link:</p>
         <input
           type="text"
           name="magnet"
@@ -371,7 +371,7 @@ export default function Index() {
           onChange={(e) => {
             debounce(e.target.value, "magnet");
           }}
-          id="fileInput"
+          id="magnetInput"
         />
       </div>
 

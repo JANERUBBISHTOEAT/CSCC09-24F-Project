@@ -430,9 +430,12 @@ i {
 }
 
 #index-page {
+  display: flex;
+  flex-direction: column;
   margin: 2rem auto;
   text-align: center;
   color: #818181;
+  height: 100%;
 }
 
 #index-page a {
@@ -461,7 +464,8 @@ i {
   display: flex;
   justify-content: center;
   gap: 1rem;
-  margin: 10px;
+  margin: 2.5rem;
+  margin-top: auto;
 }
 
 .hidden {
