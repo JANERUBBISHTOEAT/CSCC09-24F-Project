@@ -275,10 +275,11 @@ export default function Index() {
       if (fetcher.data?.fileId) {
         const formData = new FormData();
         formData.append("intent", "updateFile");
-        formData.append("fileId", fetcher.data.fileId);
+        formData.append("fileid", fetcher.data.fileId);
         formData.append("magnet", torrent.magnetURI);
         formData.append("filename", torrent.name);
         formData.append("filesize", torrent.length);
+        formData.append("filetype", torrent.files[0].type);
         fetcher.submit(formData, {
           method: "POST",
           action: "/api/files",

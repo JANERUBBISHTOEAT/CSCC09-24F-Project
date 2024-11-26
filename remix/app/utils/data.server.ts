@@ -131,21 +131,30 @@ export async function getFile(userId: string, id: string) {
 export async function updateFile(
   userId: string,
   fileId: string,
-  updates: FileMutation
+  updates: FileMutation,
+  force: boolean = false,
+  allowDelete: boolean = true
 ) {
   const file = await fileService.get(userId, fileId);
   if (!file) {
     throw new Error(`No file found for ${fileId}`);
   }
   // * Deduplicate here as `.set` has other use cases
-  const duplicateFile = await fileService.get_dup(userId, updates);
-  if (duplicateFile) {
-    if (duplicateFile.notes === updates.notes) {
-      // Do not create, return existing file
-      console.log("Duplicate file found:", duplicateFile.id);
-      return duplicateFile;
+  if (!force) {
+    const duplicateFile = await fileService.get_dup(userId, updates);
+    if (duplicateFile) {
+      if (duplicateFile.notes === updates.notes) {
+        if (allowDelete) {
+          console.log("Deleting duplicate file:", duplicateFile.id);
+          fileService.destroy(userId, fileId);
+        }
+        // Do not create, return existing file
+        console.log("Duplicate file found:", duplicateFile.id);
+        return duplicateFile;
+      }
     }
   }
+
   const newFile = await fileService.set(userId, fileId, {
     ...file,
     ...updates,
