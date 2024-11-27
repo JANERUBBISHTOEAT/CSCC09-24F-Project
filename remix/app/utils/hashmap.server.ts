@@ -24,14 +24,16 @@ export default class HashMap {
     let attempts: number = 0;
     let token: number = -1;
     let hash: string;
+    let token_len: number = 6;
 
     while (attempts++ < maxRetries) {
-      // [ ]: Make 6 a variable that increases when full
+      // [x]: Make 6 a variable that increases when full
       hash = this.crypto.createHash("md5").update(str).digest("hex");
-      token = parseInt(hash.slice(0, 6), 16) % 10 ** 6;
+      token = parseInt(hash.slice(0, token_len), 16) % 10 ** token_len;
 
       const exists = (await this.get(token.toString())) !== str; // Collision
       if (!exists) break;
+      token_len++;
     }
     if (attempts === maxRetries) {
       console.error("genKey failed with attempts", attempts);
@@ -47,13 +49,13 @@ export default class HashMap {
 
   static async set(
     token: string,
-    magnet: string,
-    expiry: number = 60 * 60
+    magnet: string
+    // expiry: number = 60 * 60
   ): Promise<void | null> {
     console.info("Redis health:", ((await this.getKeysCnt()) || -1) / 10 ** 6);
     if (!redis) return null;
     await redis.hset("tokenMap", token, magnet);
-    await redis.expire("tokenMap", expiry);
+    // await redis.expire("tokenMap", expiry);
   }
 
   static async get(token: string): Promise<string | null> {
