@@ -10,6 +10,7 @@ import { fileIconMap } from "~/utils/constants";
 import type { FileRecord } from "~/utils/data.server";
 import { getFile, updateFile } from "~/utils/data.server";
 import { getUserSession, getVisitorSession } from "~/utils/session.server";
+import { prettyBytes } from "~/utils/functions";
 
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   invariant(params.fileId, "Missing fileId param");
@@ -45,6 +46,11 @@ export default function File() {
     }
   }, [location]);
 
+  const copyToken = (token: string) => async () => {
+    await navigator.clipboard.writeText(token);
+    toastr.success("Token copied to clipboard");
+  };
+
   const { file: file } = useLoaderData<typeof loader>();
   return (
     <div id="contact">
@@ -62,7 +68,7 @@ export default function File() {
       </div>
 
       <div>
-        <h1>
+        <h1 onClick={copyToken(file.token)}>
           {file.filename || file.token ? (
             <>
               {file.filename} #{file.token}
@@ -73,18 +79,18 @@ export default function File() {
           <Favorite file={file} />
         </h1>
 
+        <p></p>
+
         {0 && file.notes ? (
           <p>
             Shared with <a href={`/users/${file.notes}`}>{file.notes}</a>
           </p>
         ) : null}
-
+        {file.size ? <p>Size: {prettyBytes(file.size)}</p> : null}
         {file.notes ? (
-          <div>
-            <p></p>
-            <p>Notes:</p>
-            <p>{file.notes}</p>
-          </div>
+          <>
+            <p>Notes: {file.notes}</p>
+          </>
         ) : null}
 
         <div>

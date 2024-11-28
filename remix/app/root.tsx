@@ -149,6 +149,16 @@ export default function App() {
                         <i>No Name</i>
                       )}{" "}
                       {file.favorite ? <span>★</span> : null}
+                      <i
+                        className={
+                          "fas " + (file.owner ? "fa-upload" : "fa-download")
+                        }
+                        title={
+                          file.owner
+                            ? "You created this file"
+                            : "You downloaded this file"
+                        }
+                      ></i>
                     </NavLink>
                   </li>
                 ))}

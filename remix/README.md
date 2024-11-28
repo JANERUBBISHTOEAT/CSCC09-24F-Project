@@ -32,11 +32,13 @@ docker run --rm -p 3000:3000 --network="host" --pull=always zheyuanwei/w2w
 Clean up:
 
 ```sh
-docker stop $(docker ps -aq)
-docker rm $(docker ps -aq)
 docker rmi -f $(docker images -q)
 docker image prune -a
+y
 docker system prune -a --volumes
+y
+docker stop $(docker ps -aq)
+docker rm $(docker ps -aq)
 ```
 
 HTTPS (necessary for WebCrypto API, which is necessary for WebTorrent):

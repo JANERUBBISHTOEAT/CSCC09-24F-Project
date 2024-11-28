@@ -105,7 +105,6 @@ export default function Index() {
   const [user, setUser] = useState<Record<string, any> | null>(null);
   const debounceTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-
   async function loadModule() {
     console.log("Loading WebTorrent module");
     if (typeof window !== "undefined" && !clientRef.current) {
@@ -207,7 +206,7 @@ export default function Index() {
     console.log("Fetcher data:", fetcher.data);
 
     // Acquire user data
-    if (fetcher.data.user) {
+    if ("user" in fetcher.data) {
       setUser(fetcher.data.user);
       return;
     }
