@@ -1,23 +1,23 @@
-import "@fortawesome/fontawesome-free/css/all.min.css";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 import { Form, useFetcher, useLoaderData, useNavigate } from "@remix-run/react";
 import { useEffect, useRef, useState } from "react";
 import Swal from "sweetalert2";
-import "sweetalert2/dist/sweetalert2.min.css";
 import invariant from "tiny-invariant";
 import toastr from "toastr";
-import "toastr/build/toastr.min.css";
 import { fileIconMap } from "~/utils/constants";
 import { deleteFile, getFile, updateFile } from "~/utils/data.server";
 import HashMap from "~/utils/hashmap.server";
+import { getUserSession, getVisitorSession } from "~/utils/session.server";
 
-export const loader = async ({ params }: LoaderFunctionArgs) => {
+export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   invariant(params.fileId, "Missing fileId param");
-  const file = await getFile(params.fileId);
+  const user = await getUserSession(request);
+  const visitor = await getVisitorSession(request);
+  const file = await getFile(user?.sub || visitor?.sub, params.fileId);
+  console.log("File @loader:", file);
   if (!file) {
-    redirect("/?message=Page+Not+Found");
-    throw new Response("Not Found", { status: 404 });
+    return redirect("/?message=Page+Not+Found");
   }
   return json({ file: file });
 };
@@ -31,35 +31,22 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
   const formObj = Object.fromEntries(formData);
   console.log("formObj:", formObj);
 
-  // * Is torrent callback
-  if (formObj.intent === "acquireToken") {
-    console.log("intent: acquireToken");
-    // No magnet provided, return
-    if (!formObj.magnet) {
-      return json({ token: "" });
-    }
-
-    // Generate & save token
-    const token = await HashMap.genToken(formObj.magnet as string);
-    console.log("Token:", token);
-
-    return json({ token: token });
-  }
-
   // Get file which is gonna use anyway
-  const file = await getFile(params.fileId);
+  const user = await getUserSession(request);
+  const visitor = await getVisitorSession(request);
+  const file = await getFile(user?.sub || visitor?.sub, params.fileId);
   if (!file) {
     redirect("/?message=Page+Not+Found");
     throw new Response("Not Found", { status: 404 });
   }
-  console.log("File:", file);
+  console.log("File @action:", file);
 
   // * is human cancel submission
   if (formObj.intent === "cancelSubmission") {
     console.log("intent: cancelSubmission");
     // if file is newly created, delete it
     if (!file.magnet) {
-      deleteFile(params.fileId);
+      deleteFile(user?.sub || visitor?.sub, params.fileId);
     }
 
     // else, don't save changes
@@ -71,33 +58,36 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
   console.log("intent: saveFile");
 
   // No file or link provided, delete this record
-  if (!formObj.file || !formObj.magnet) {
-    deleteFile(params.fileId);
+  if (!formObj.fileName || !formObj.magnet) {
+    deleteFile(user?.sub || visitor?.sub, params.fileId);
     return redirect("/?message=File+not+saved");
   }
 
   const updates = {
-    filename:
-      (formObj.file as File).name || file.filename || params.fileId || "",
-    type: (formObj.file as File).type || file.type || "",
-    size: (formObj.file as File).size || file.size || -1,
-    magnet: (formObj.magnet as string) || file.magnet || "",
-    token: (formObj.token as string) || file.token || "",
-    notes: (formObj.notes as string) || file.notes || "",
+    filename: formObj.fileName || file.filename || params.fileId || "",
+    type: formObj.fileType || file.type || "",
+    size: formObj.fileSize || file.size || -1,
+    magnet: formObj.magnet || file.magnet || "",
+    token: formObj.token || file.token || "",
+    notes: formObj.notes || file.notes || "",
   };
 
   console.log("Updates:", updates);
 
-  const newFile = await updateFile(params.fileId, updates);
-  // TODO: Update token element
-  return redirect(`/files/${params.fileId}/?message=File+saved`);
+  const newFile = await updateFile(
+    user?.sub || visitor?.sub,
+    params.fileId,
+    updates as any
+  );
+  // [x]: Update token element
+  return redirect(`/files/${newFile.id}/?message=File+saved`);
 };
 
 export default function EditFile() {
   const { file: dbFileJson } = useLoaderData<typeof loader>();
   const navigate = useNavigate();
 
-  const [file, setFile] = useState<File | null>(null); // TODO: Check if this was unused
+  const [file, setFile] = useState<File | null>(null); // [x] Used for react state
   const [token, setToken] = useState<string | null>(null);
   const [torrent, setTorrent] = useState<any | null>(null);
   const fetcher = useFetcher();
@@ -119,6 +109,7 @@ export default function EditFile() {
   }, []);
 
   const handleSubmit = (files: FileList | null) => {
+    // [x]: Update element (should modify element || order)
     invariant(files, "No file selected");
     if (!clientRef.current || !files) {
       Swal.fire({
@@ -136,18 +127,18 @@ export default function EditFile() {
 
     // Seed the file
     const selectedFile = files[0];
-    clientRef.current.seed(selectedFile, async (torrent) => {
+    clientRef.current.seed(selectedFile, async (torrent: any) => {
+      console.log("Client is seeding:", torrent.magnetURI);
       clearTimeout(timeoutId);
       setTorrent(torrent);
-      console.log("Client is seeding:", torrent.magnetURI);
 
-      // [ ] Call action with intend to acquire token
+      // [x] Call action with intend to acquire token
       const formData = new FormData();
       formData.append("intent", "acquireToken");
       formData.append("magnet", torrent.magnetURI);
       fetcher.submit(formData, {
         method: "POST",
-        action: ".",
+        action: "/api/" + dbFileJson.id + "/token",
       });
 
       Swal.fire({
@@ -207,7 +198,7 @@ export default function EditFile() {
       key={dbFileJson.id}
       id="contact-form"
       method="post"
-      encType="multipart/form-data"
+      // encType="multipart/form-data"
     >
       <div
         id="dropzone"
@@ -252,48 +243,52 @@ export default function EditFile() {
         <span>Name</span>
         <input
           aria-label="Filename"
-          name="filename"
-          defaultValue={dbFileJson.filename || file?.name || ""}
+          name="fileName"
+          value={file?.name || dbFileJson.filename || ""}
           placeholder="Filename"
           type="text"
+          readOnly
         />
         <input
           aria-label="Token"
           name="token"
-          defaultValue={dbFileJson.token || token || ""}
+          value={token || dbFileJson.token || ""}
           placeholder="Token"
           type="text"
           disabled
+          readOnly
         />
         <button id="copy-token" type="button" onClick={handleCopy}>
           Copy
         </button>
       </p>
-      <label>
+      {/* <label className="hidden">
         <span>Share with</span>
         <input
           defaultValue={dbFileJson.notes || ""}
-          name="notes"
+          name="share"
           placeholder="TODO"
           type="text"
           disabled
+          readOnly
         />
-      </label>
+      </label> */}
       <label>
         <span>File Link</span>
         <input
           name="_magnet"
-          defaultValue={dbFileJson.magnet || torrent?.magnetURI || ""}
+          value={torrent?.magnetURI || dbFileJson.magnet || ""}
           placeholder="magnet:?"
           type="text"
           // type="password"
           disabled
+          readOnly
         />
         <input
           className="hidden"
           type="text"
           name="magnet"
-          value={dbFileJson.magnet || torrent?.magnetURI || ""}
+          value={torrent?.magnetURI || dbFileJson.magnet || ""}
           readOnly
         />
         <button id="copy-magnet" type="button" onClick={handleCopy}>
@@ -304,6 +299,19 @@ export default function EditFile() {
         <span>Notes</span>
         <textarea defaultValue={dbFileJson.notes || ""} name="notes" rows={6} />
       </label>
+      <input
+        type="hidden"
+        name="fileType"
+        value={file?.type || dbFileJson.type || ""}
+        readOnly
+      />
+      <input
+        type="hidden"
+        name="fileSize"
+        value={file?.size || dbFileJson.size || -1}
+        readOnly
+      />
+
       <p>
         <button type="submit">Save</button>
         <button

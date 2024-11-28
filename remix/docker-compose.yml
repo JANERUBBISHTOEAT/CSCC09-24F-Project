@@ -9,6 +9,8 @@ services:
     ports:
       - "80:80"
       - "443:443"
+    environment:
+      DEFAULT_HOST: w2w.space
     volumes:
       - /var/run/docker.sock:/tmp/docker.sock:ro
       - ./certs:/etc/nginx/certs
@@ -33,6 +35,7 @@ services:
   # Remix fullstack application
   remix:
     build: .
+    # image: zheyuanwei/w2w
     container_name: remix
     restart: always
     environment:

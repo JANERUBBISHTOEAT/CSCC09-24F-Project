@@ -1,12 +1,17 @@
-////////////////////////////////////////////////////////////////////////////////
-// 🛑 Nothing in here has anything to do with Remix, it's just a fake database
-////////////////////////////////////////////////////////////////////////////////
-
 import { matchSorter } from "match-sorter";
-// @ts-expect-error - no types, but it's a tiny function
-import sortBy from "sort-by";
+// import sortBy from "sort-by";
+import orderBy from "lodash/orderBy";
 import invariant from "tiny-invariant";
 import HashMap from "./hashmap.server";
+import Redis from "ioredis";
+import dotenv from "dotenv";
+
+dotenv.config();
+console.log("redis env:", process.env.REDIS_HOST, process.env.REDIS_PORT);
+const redis = new Redis({
+  host: process.env.REDIS_HOST || "localhost",
+  port: parseInt(process.env.REDIS_PORT || "6379", 10),
+});
 
 type FileMutation = {
   id?: string;
@@ -17,6 +22,8 @@ type FileMutation = {
   token?: string;
   notes?: string;
   favorite?: boolean;
+  // [x]: Add attr `sender/receiver`
+  owner?: boolean;
 };
 
 export type FileRecord = FileMutation & {
@@ -24,86 +31,153 @@ export type FileRecord = FileMutation & {
   createdAt: string;
 };
 
-////////////////////////////////////////////////////////////////////////////////
-// This is just a fake DB table. In a real app you'd be talking to a real db or
-// fetching from an existing API.
-const fakeFiles = {
-  records: {} as Record<string, FileRecord>,
+const userFilesKey = (userId: string) => `user:${userId}:files`;
 
-  async getAll(): Promise<FileRecord[]> {
-    return Object.keys(fakeFiles.records)
-      .map((key) => fakeFiles.records[key])
-      .sort(sortBy("-createdAt", "last"));
+// [x]: Rename
+const fileService = {
+  async getAll(userId: string): Promise<FileRecord[]> {
+    const keys = await redis.hkeys(userFilesKey(userId));
+    const files = await Promise.all(
+      keys.map((key) => redis.hget(userFilesKey(userId), key).then(JSON.parse))
+    );
+    return orderBy(files, "createdAt", "desc");
   },
 
-  async get(id: string): Promise<FileRecord | null> {
-    // TODO: Use redis.get
-    return fakeFiles.records[id] || null;
+  async get(userId: string, id: string): Promise<FileRecord | null> {
+    const file = await redis.hget(userFilesKey(userId), id);
+    return file ? JSON.parse(file) : null;
   },
 
-  async create(values: FileMutation): Promise<FileRecord> {
+  async create(userId: string, values: FileMutation): Promise<FileRecord> {
+    // * Deduplicate here as `.create` should be duplicate-free
+    const duplicateFile = await fileService.get_dup(userId, values);
+
+    if (duplicateFile) {
+      console.log("Duplicate file found:", duplicateFile.id);
+      // Do not create, return existing file
+      return duplicateFile;
+    }
+
+    // Create new file
     const id = values.id || Math.random().toString(36).substring(2, 9);
     const createdAt = new Date().toISOString();
     const newFile = { id, createdAt, ...values };
     if (newFile.magnet) {
       const token_str = await HashMap.genToken(newFile.magnet);
-      newFile.token = token_str;
+      newFile.token = token_str ?? undefined;
       console.log("Updated token:", newFile.token);
     }
-    fakeFiles.records[id] = newFile;
+    await redis.hset(userFilesKey(userId), id, JSON.stringify(newFile));
     return newFile;
   },
 
-  async set(id: string, values: FileMutation): Promise<FileRecord> {
-    const file = await fakeFiles.get(id);
+  async get_dup(
+    userId: string,
+    values: FileMutation
+  ): Promise<FileRecord | null> {
+    const files = await fileService.getAll(userId);
+    if (!values) return null; // No values to compare
+    const duplicateFile = files.find(
+      (file) =>
+        file.magnet === values.magnet && file.filename === values.filename
+    );
+    return duplicateFile || null;
+  },
+
+  async set(
+    userId: string,
+    id: string,
+    values: FileMutation
+  ): Promise<FileRecord> {
+    const file = await fileService.get(userId, id);
     invariant(file, `No file found for ${id}`);
+
     const updatedFile = { ...file, ...values };
     if (updatedFile.magnet) {
       const token_str = await HashMap.genToken(updatedFile.magnet);
-      updatedFile.token = token_str;
+      updatedFile.token = token_str ?? undefined;
       console.log("Updated token:", updatedFile.token);
     }
-    fakeFiles.records[id] = updatedFile;
+    await redis.hset(userFilesKey(userId), id, JSON.stringify(updatedFile));
     return updatedFile;
   },
 
-  destroy(id: string): null {
-    delete fakeFiles.records[id];
+  async destroy(userId: string, id: string): Promise<null> {
+    await redis.hdel(userFilesKey(userId), id);
     return null;
   },
 };
 
-////////////////////////////////////////////////////////////////////////////////
-// Handful of helper functions to be called from route loaders and actions
-export async function getFiles(query?: string | null) {
-  await new Promise((resolve) => setTimeout(resolve, 500));
-  let files = await fakeFiles.getAll();
+export async function getFiles(userId: string, query?: string | null) {
+  let files = await fileService.getAll(userId);
+
   if (query) {
     files = matchSorter(files, query, {
       keys: ["filename", "token"],
     });
   }
-  return files.sort(sortBy("last", "createdAt"));
+  return orderBy(files, "createdAt", "desc");
 }
 
-export async function createEmptyFile() {
-  const file = await fakeFiles.create({});
+export async function createEmptyFile(userId: string, owner: boolean = true) {
+  // Only owner can create file
+  const file = await fileService.create(userId, { owner: owner });
   return file;
 }
 
-export async function getFile(id: string) {
-  return fakeFiles.get(id);
+export async function getFile(userId: string, id: string) {
+  return fileService.get(userId, id);
 }
 
-export async function updateFile(id: string, updates: FileMutation) {
-  const file = await fakeFiles.get(id);
+export async function updateFile(
+  userId: string,
+  fileId: string,
+  updates: FileMutation,
+  force: boolean = false,
+  allowDelete: boolean = false
+) {
+  const file = await fileService.get(userId, fileId);
+
   if (!file) {
-    throw new Error(`No file found for ${id}`);
+    throw new Error(`No file found for ${fileId}`);
   }
-  await fakeFiles.set(id, { ...file, ...updates });
-  return file;
+  // * Deduplicate here as `.set` has other use cases
+  if (!force) {
+    const duplicateFile = await fileService.get_dup(userId, updates);
+    if (duplicateFile) {
+      if (duplicateFile.notes === updates.notes) {
+        if (allowDelete) {
+          console.log("Deleting duplicate file:", duplicateFile.id);
+          fileService.destroy(userId, fileId);
+        }
+        // Do not create, return existing file
+        console.log("Duplicate file found:", duplicateFile.id);
+        return duplicateFile;
+      }
+    }
+  }
+
+  const newFile = await fileService.set(userId, fileId, {
+    ...file,
+    ...updates,
+  });
+  return newFile;
 }
 
-export async function deleteFile(id: string) {
-  fakeFiles.destroy(id);
+export async function deleteFile(userId: string, id: string) {
+  await fileService.destroy(userId, id);
+}
+
+// Merge visitor files to existing user files
+export async function mergeFiles(
+  userId: string,
+  visitorId: string
+): Promise<FileRecord[]> {
+  const visitorFiles = await fileService.getAll(visitorId);
+  console.log("Merging", visitorFiles.length, "files from", visitorId);
+  await Promise.all(
+    visitorFiles.map((file) => fileService.create(userId, file))
+  );
+  await redis.del(userFilesKey(visitorId));
+  return fileService.getAll(userId);
 }

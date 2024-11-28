@@ -139,3 +139,5 @@ frontend/static/*.min.js
 
 acme/
 certs/
+
+.env*

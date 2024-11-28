@@ -60,6 +60,10 @@ button:active {
   display: flex;
   align-items: flex-start;
   gap: 1rem;
+  padding: 5px;
+}
+#contact p {
+  padding: 5px;
 }
 #contact h1 form {
   display: flex;
@@ -430,9 +434,12 @@ i {
 }
 
 #index-page {
+  display: flex;
+  flex-direction: column;
   margin: 2rem auto;
   text-align: center;
   color: #818181;
+  height: 100%;
 }
 
 #index-page a {
@@ -455,4 +462,54 @@ i {
   align-items: center;
   justify-content: center;
   width: 100%;
+}
+
+.google-login-container {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin: 2.5rem;
+  margin-top: auto;
+}
+
+.hidden {
+  display: none;
+}
+
+.wrong-input {
+  border: 1px solid red;
+  outline: none;
+  animation: pulse-red 0.2s 1 ease-out;
+}
+@keyframes pulse-red {
+  0% {
+    box-shadow: 0 0 0px red;
+  }
+  50% {
+    box-shadow: 0 0 10px red;
+  }
+  100% {
+    box-shadow: 0 0 0px red;
+  }
+}
+
+.correct-input {
+  border: 1px solid green;
+  outline: none;
+  animation: pulse-green 3s infinite ease-in-out;
+}
+@keyframes pulse-green {
+  0% {
+    box-shadow: 0 0 0px green;
+  }
+  50% {
+    box-shadow: 0 0 30px green;
+  }
+  100% {
+    box-shadow: 0 0 0px green;
+  }
+}
+
+#fileList {
+  margin: 10px;
 }

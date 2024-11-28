@@ -2,25 +2,26 @@ import { vitePlugin as remix } from "@remix-run/dev";
 import { fileURLToPath } from "url";
 import { defineConfig } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
+import dotenv from "dotenv";
+
+dotenv.config();
+const isProduction = process.env.NODE_ENV === "production";
 
 export default defineConfig({
-  // server: {
-  //   https: {
-  //     key: "./server.key",
-  //     cert: "./server.crt",
-  //   },
-  //   host: "0.0.0.0",
-  //   port: 3000,
-  // },
+  esbuild: isProduction
+    ? {
+        drop: ["console", "debugger"],
+      }
+    : {},
   plugins: [
     remix({
-      // ssr: false,
       ignoredRouteFiles: ["**/*.css"],
     }),
     tsconfigPaths(),
   ],
   resolve: {
     alias: {
+      "~": "/app",
       webtorrent: fileURLToPath(
         new URL(
           "./node_modules/webtorrent/dist/webtorrent.min.js",
