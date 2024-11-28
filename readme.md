@@ -73,7 +73,7 @@ stateDiagram-v2
     S1 --> S3 : login + merge
     S1 --> S2 : add files
     S2 --> S3 : login + merge
-    S3 --> S1 : login + clear
+    S3 --> S1 : logout + clear
 ```
 
 ### Frontend
