@@ -42,7 +42,7 @@ The final version of the application will incorporate the following additional f
 - [ ] Receivers can download the file before fully uploaded: streaming / chunking.
 - [ ] Establish multiple P2P links to expedite download speed.*
 - [ ] Distributing chunks to multiple users to enhance download speed.*
-- [ ] Senders may close the browser and the file will still be available to download: advanced seeding.*
+- [ ] Senders may close the browser and the file will still be available to download: IPFS.*
 
 #### Security
 
@@ -112,27 +112,10 @@ Potential challenges may arise in developing [WebToWeb](#introduction), some of 
 
 3. **WebRTC Limitations**: Even though WebRTC is supported my major modern browsers, it may not be supported by all browsers/platforms. Due to compatibility issues, this feature might be unavailable or function improperly on certain machines or systems.
 
-4. **File Chunking**: Not implemented
-
-5. **Advanced Seeding**: Not implemented
-
-6. **Security**: Not implemented
-
-## Optimization
-
-TODO: move Additional Features to Optimization after implementation
+4. **Security**: Not implemented
 
 ## Discussion
 
-*TODO*:
+The app proves highly effective for quick file sharing, particularly with small files. It simplifies transferring files to or from university lab machines without requiring user logins to cloud storage or email services, or dealing with lengthy sharing links. Instead, it generates a simple 6-digit code for the recipient to download the file. Additionally, it tracks uploaded and downloaded files, making it convenient for users to resend files when needed.
 
-- Discuss advantages and disadvantages of our implementation.
-- Address possible future world and optimization can be performed on this project architecture.
-
-## Conclusion
-
-TODO
-
-## References
-
-TODO
+The future app can be enhanced by integrating security measures like encryption and secure key exchange to safeguard user data. Costs could be minimized by decoupling the frontend and backend, hosting the static frontend on free platforms like Vercel or GitHub Pages, and deploying the backend on a more cost-efficient service.
