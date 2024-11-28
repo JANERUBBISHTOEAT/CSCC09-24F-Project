@@ -1,3 +1,8 @@
+---
+export_on_save:
+  prince: true
+---
+
 # CSCC09 24F Final Project - WebToWeb: A Secure Web Implementation for P2P File Sharing
 
 $\quad$ This paper presents a browser-based BitTorrent client with encrypted file-sharing functionality. The client will leverage [Remix](https://remix.run/) and [WebTorrent](https://github.com/webtorrent/webtorrent) for the frontend, with backend deployment on Google Cloud Platform. Project evaluation will focus on performance, security, and user experience.
