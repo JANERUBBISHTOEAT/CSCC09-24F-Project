@@ -10,9 +10,9 @@ $\quad$ This paper presents a browser-based BitTorrent client with encrypted fil
 
 ## Introduction
 
-[WebToWeb](#introduction) will be a web application designed for secure, fast file sharing through a peer-to-peer (P2P) system. Unlike traditional methods requiring files to upload to a server before download, which can be slow and less secure, this app allows direct user-to-user file transfer, significantly enhancing speed. Additionally, encryption ensures high security for all shared files on the P2P network.
+Video demo: <https://youtu.be/Fw5PdmKwTec>
 
-A demonstration was already found at [webtorrent.io](https://webtorrent.io/) illustrates certain limitations in the current implementation: files are shared directly between users without encryption, posing security risks; file size is constrained by browser memory; and files are lost if the sender closes the browser. [WebToWeb](#introduction) seeks to resolve these issues by developing a more advanced, secure, and user-friendly P2P file-sharing application.
+[WebToWeb](#introduction) will be a web application designed for fast file sharing through a peer-to-peer (P2P) system. Unlike traditional methods requiring files to upload to a server before download, which can be slow and less secure, this app allows direct user-to-user file transfer, significantly enhancing speed. Additionally, encryption ensures high security for all shared files on the P2P network.
 
 ## Features
 
