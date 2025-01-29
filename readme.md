@@ -9,15 +9,7 @@ export_on_save:
 
 $\quad$ This paper presents a browser-based BitTorrent client with encrypted file-sharing functionality. The client will leverage [Remix](https://remix.run/) and [WebTorrent](https://github.com/webtorrent/webtorrent) for the frontend, with backend deployment on Google Cloud Platform. Project evaluation will focus on performance, security, and user experience.
 
-## Group Members
-
-| Name | Student Number | Email |
-| ---- | -------------- | ----- |
-| Zheyuan Wei | 1007626133 | <zheyuan.wei@mail.utoronto.ca> |
-
 ## Introduction
-
-Video demo: <https://youtu.be/Fw5PdmKwTec>
 
 [WebToWeb](#introduction) will be a web application designed for fast file sharing through a peer-to-peer (P2P) system. Unlike traditional methods requiring files to upload to a server before download, which can be slow and less secure, this app allows direct user-to-user file transfer, significantly enhancing speed. Additionally, encryption ensures high security for all shared files on the P2P network.
 
@@ -44,8 +36,6 @@ The final version of the application will incorporate the following additional f
 - [x] Users account keep records of files uploaded and downloaded.
 - [x] Visitors can upload/download files and also have a record of their activities.
 - [x] Visitor activities is merged with user account upon login.
-- [ ] Large files are split into chunks to accommodate browser memory constraints.
-- [ ] Reassembling file chunks seamlessly on the recipient's end.
 - [ ] Receivers can download the file before fully uploaded: streaming / chunking.
 - [ ] Establish multiple P2P links to expedite download speed.*
 - [ ] Distributing chunks to multiple users to enhance download speed.*
