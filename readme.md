@@ -11,6 +11,8 @@ Access the web app at: <https://w2w.space/>
 - [ ] Improve UI to prevent accidental page refresh/leave
 - [ ] Add JWT validation
 - [ ] Add expiration for tokens
+- [ ] Multi-device sync (i.e., the fetch is now triggered on routing event)
+- [ ] Resolve console complains
 
 ## Features
 
