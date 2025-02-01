@@ -429,7 +429,7 @@ export default function Index() {
         </div>
         <GoogleOAuthProvider clientId={client_id}>
           <div className={loggedIn ? "hidden" : ""}>
-            <p>or log in to see file history:</p>
+            <p>or log in to sync file history:</p>
             <GoogleLogin
               onSuccess={(credentialResponse) => {
                 console.log(credentialResponse);
@@ -441,6 +441,29 @@ export default function Index() {
             />
           </div>
         </GoogleOAuthProvider>
+      </div>
+
+      <div className="footer">
+        <a
+          className="visitor-badge"
+          href="https://visitorbadge.io/status?path=https%3A%2F%2Fw2w.space%2F"
+        >
+          <img
+            src={
+              "https://api.visitorbadge.io/api/combined?" +
+              "path=https%3A%2F%2Fw2w.space%2F&" +
+              "countColor=%2337d67a&" +
+              "style=plastic&labelStyle=none"
+            }
+            alt="Visitor badge"
+          />
+        </a>
+        <a
+          className="github-link"
+          href="https://github.com/JANERUBBISHTOEAT/CSCC09-24F-Project"
+        >
+          View on GitHub
+        </a>
       </div>
     </div>
   );
