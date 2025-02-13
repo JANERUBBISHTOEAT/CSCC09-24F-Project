@@ -224,6 +224,18 @@ export default function EditFile() {
       console.log("Response data:", fetcher.data);
       const receivedToken = fetcher.data.token || "";
       setToken(receivedToken);
+
+      // Copy token to clipboard
+      navigator.clipboard.writeText(torrent.magnetURI).then(
+        () => {
+          console.log("Token copied to clipboard");
+          toastr.success("Token copied to clipboard");
+        },
+        (err) => {
+          console.error("Failed to copy token: ", err);
+          toastr.error("Failed to copy token");
+        }
+      );
     }
   }, [fetcher.data]);
 
@@ -242,12 +254,12 @@ export default function EditFile() {
       // text.select();
       navigator.clipboard.writeText(text.value).then(
         () => {
-          console.log("Text copied to clipboard");
-          toastr.success("Copied to clipboard");
+          console.log("Token copied to clipboard");
+          toastr.success("Token copied to clipboard");
         },
         (err) => {
-          console.error("Failed to copy text: ", err);
-          toastr.error("Failed to copy text");
+          console.error("Failed to copy token: ", err);
+          toastr.error("Failed to copy token");
         }
       );
     }
