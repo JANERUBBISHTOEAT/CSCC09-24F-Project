@@ -1,0 +1,31 @@
+<svg width='26' height='20' viewBox="0 0 26 20" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Audiowide&amp;display=swap');
+        .textLayer {
+        font-family: "Audiowide", sans-serif;
+        font-size: 25px;
+        /* font-weight: ; */
+        text-anchor: middle;
+        dominant-baseline: middle;
+      }
+      .outline {
+        fill: black;
+        stroke: white;
+        stroke-width: 0.5;
+      }
+      .blend {
+        mix-blend-mode: multiply;
+      }
+    </style>
+  </defs>
+  <!--  W -->
+  <g id="letter1" transform="translate(13,12)">
+    <!-- Top left -->
+    <text x="0" y="0" class="textLayer blend" fill="#3DEFE9" transform="translate(-0.5,-0.5)">W</text>
+    <!-- Right bottom -->
+    <text x="0" y="0" class="textLayer blend" fill="#D83BD2" transform="translate(1,1)">W</text>
+    <!-- Main -->
+    <text x="0" y="0" class="textLayer outline">W</text>
+  </g>
+</svg>
