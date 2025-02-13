@@ -133,21 +133,40 @@ export default function EditFile() {
     document.addEventListener("paste", handlePaste);
   }, []);
 
-  const [isBlocking, setIsBlocking] = useState(false);
-  useBlocker(() => isBlocking);
-  useEffect(() => {
-    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
-      if (isBlocking) {
-        event.preventDefault();
-        // event.returnValue = "LEAVE_CONFIRMATION";
-      }
-    };
+  // const [isBlocking, setIsBlocking] = useState(false);
+  // const blocker = useBlocker(() => isBlocking);
+  // useEffect(() => {
+  //   if (blocker.state === "blocked") {
+  //     Swal.fire({
+  //       title: "Stay on page to keep seeding",
+  //       text: "Stay on page to keep seeding",
+  //       icon: "info",
+  //       showCancelButton: true,
+  //       confirmButtonText: "Stay",
+  //       cancelButtonText: "Leave",
+  //       showCloseButton: true,
+  //     }).then((result) => {
+  //       if (result.isConfirmed) {
+  //         blocker.reset(); // Cancel navigation
+  //       } else {
+  //         blocker.proceed(); // Continue navigation
+  //       }
+  //     });
+  //   }
+  // }, [blocker]);
 
-    window.addEventListener("beforeunload", handleBeforeUnload);
-    return () => {
-      window.removeEventListener("beforeunload", handleBeforeUnload);
-    };
-  }, [isBlocking]);
+  // useEffect(() => {
+  //   const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+  //     if (isBlocking) {
+  //       event.preventDefault();
+  //       // event.returnValue = "LEAVE_CONFIRMATION";
+  //     }
+  //   };
+  //   window.addEventListener("beforeunload", handleBeforeUnload);
+  //   return () => {
+  //     window.removeEventListener("beforeunload", handleBeforeUnload);
+  //   };
+  // }, [isBlocking]);
 
   const handleSubmit = (files: FileList | null) => {
     // [x]: Update element (should modify element || order)
