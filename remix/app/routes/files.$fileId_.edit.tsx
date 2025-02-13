@@ -104,8 +104,29 @@ export default function EditFile() {
     }
   }
 
+  async function handlePaste(event: ClipboardEvent) {
+    const items = event.clipboardData?.items;
+    if (!items) {
+      return;
+    }
+
+    for (let i = 0; i < items.length; i++) {
+      if (items[i].kind === "file") {
+        const file = items[i].getAsFile();
+        console.log("Global file paste event:", file);
+        if (file) {
+          setFile(file);
+          const dataTransfer = new DataTransfer();
+          dataTransfer.items.add(file);
+          handleSubmit(dataTransfer.files);
+        }
+      }
+    }
+  }
+
   useEffect(() => {
     loadModule();
+    document.addEventListener("paste", handlePaste);
   }, []);
 
   const handleSubmit = (files: FileList | null) => {
@@ -214,20 +235,6 @@ export default function EditFile() {
         }}
         onDragOver={(event) => event.preventDefault()}
         onClick={() => document.getElementById("fileInput")?.click()}
-        onPaste={(event: React.ClipboardEvent) => {
-          const items = event.clipboardData?.items;
-          for (let i = 0; i < items?.length; i++) {
-            if (items[i].kind === "file") {
-              const droppedFile = items[i].getAsFile();
-              if (droppedFile) {
-                setFile(droppedFile);
-                const dataTransfer = new DataTransfer();
-                dataTransfer.items.add(droppedFile);
-                handleSubmit(dataTransfer.files);
-              }
-            }
-          }
-        }}
       >
         <i
           className={
