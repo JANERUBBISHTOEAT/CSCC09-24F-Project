@@ -429,7 +429,7 @@ export default function Index() {
           </button>
         </div>
         <GoogleOAuthProvider clientId={client_id}>
-          <div className={loggedIn ? "hidden" : ""}>
+          <div className={loggedIn ? "hidden" : "login-button"}>
             <p>or log in to sync file history:</p>
             <GoogleLogin
               onSuccess={(credentialResponse) => {

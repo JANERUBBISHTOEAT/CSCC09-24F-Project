@@ -475,6 +475,11 @@ i {
   margin-top: auto;
 }
 
+.login-button {
+  display: flex;
+  flex-direction: column;
+}
+
 .hidden {
   display: none;
 }
