@@ -1,0 +1,43 @@
+<svg viewBox="0 0 600 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Audiowide&display=swap');
+        .textLayer {
+        font-family:  "Audiowide", sans-serif;
+        font-size: 100px;
+        font-weight: ;
+        text-anchor: middle;
+        dominant-baseline: middle;
+      }
+      .outline {
+        fill: black;
+        stroke: white;
+        stroke-width: 2;
+      }
+      .blend {
+        mix-blend-mode: multiply;
+      }
+    </style>
+  </defs>
+  <!--  W -->
+  <g id="letter1" transform="translate(100,100)">
+    <!-- Top left -->
+    <text x="0" y="0" class="textLayer blend" fill="#3DEFE9" transform="translate(-3,-3)">W</text>
+    <!-- Right bottom -->
+    <text x="0" y="0" class="textLayer blend" fill="#D83BD2" transform="translate(3,3)">W</text>
+    <!-- Main -->
+    <text x="0" y="0" class="textLayer outline">W</text>
+  </g>
+  <!-- 2 -->
+  <g id="letter2" transform="translate(180,100)">
+    <text x="0" y="0" class="textLayer blend" fill="#6BD968" transform="translate(-3,-3)">2</text>
+    <text x="0" y="0" class="textLayer blend" fill="#3992FF" transform="translate(3,3)">2</text>
+    <text x="0" y="0" class="textLayer outline">2</text>
+  </g>
+  <!-- W -->
+  <g id="letter3" transform="translate(260,100)">
+    <text x="0" y="0" class="textLayer blend" fill="#F44250" transform="translate(-3,-3)">W</text>
+    <text x="0" y="0" class="textLayer blend" fill="#FECC1B" transform="translate(3,3)">W</text>
+    <text x="0" y="0" class="textLayer outline">W</text>
+  </g>
+</svg>
