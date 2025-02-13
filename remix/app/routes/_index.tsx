@@ -200,7 +200,7 @@ export default function Index() {
 
   useEffect(() => {
     if (!fetcher.data) {
-      console.error("No data found");
+      // console.error("No data found");
       return;
     }
 
@@ -288,26 +288,31 @@ export default function Index() {
       }
     });
 
-    torrent.on("download", (bytes: any) => {
+    torrent.on("download", () => {
       console.log(`Progress: ${(torrent.progress * 100).toFixed(2)}%`);
-      progress_div.innerHTML = `Progress: ${(torrent.progress * 100).toFixed(
-        2
-      )}%`;
-      down_speed_div.innerHTML = `Download speed: ${prettyBytes(
-        torrent.downloadSpeed
-      )}/s`;
-      up_speed_div.innerHTML = `Upload speed: ${prettyBytes(
-        torrent.uploadSpeed
-      )}/s`;
-      peers_div.innerHTML = `Peers: ${torrent.numPeers}`;
+      if (torrent.progress === 1.0) {
+        console.log("Download finished.");
+        progress_div.innerHTML = `Progress: ${(100).toFixed(2)}%`;
+        down_speed_div.innerHTML = "";
+        up_speed_div.innerHTML = "";
+        peers_div.innerHTML = "";
+      } else {
+        progress_div.innerHTML = `Progress: ${(torrent.progress * 100).toFixed(
+          2
+        )}%`;
+        down_speed_div.innerHTML = `Download speed: ${prettyBytes(
+          torrent.downloadSpeed
+        )}/s`;
+        up_speed_div.innerHTML = `Upload speed: ${prettyBytes(
+          torrent.uploadSpeed
+        )}/s`;
+        peers_div.innerHTML = `Peers: ${torrent.numPeers}`;
+      }
     });
 
     torrent.on("done", async () => {
       console.log("Download finished.");
       progress_div.innerHTML = `Progress: ${(100).toFixed(2)}%`;
-      down_speed_div.innerHTML = "";
-      up_speed_div.innerHTML = "";
-      peers_div.innerHTML = "";
 
       Swal.fire({
         icon: "success",
