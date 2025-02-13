@@ -343,11 +343,13 @@ export default function Index() {
 
     const index_elem = document.getElementById("fileList") as HTMLElement;
     const a = document.createElement("a");
+    const d = document.createElement("div");
     a.href = url;
     a.innerText = "Download file" + file.name;
     a.download = file.name;
     a.click();
-    index_elem.appendChild(a);
+    d.appendChild(a);
+    index_elem.appendChild(d);
   }
 
   const handleLogin = (credentialResponse: any) => {
