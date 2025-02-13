@@ -7,7 +7,7 @@ import invariant from "tiny-invariant";
 import toastr from "toastr";
 import { fileIconMap } from "~/utils/constants";
 import { deleteFile, getFile, updateFile } from "~/utils/data.server";
-import HashMap from "~/utils/hashmap.server";
+import { useBlocker } from "react-router-dom";
 import { getUserSession, getVisitorSession } from "~/utils/session.server";
 
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
@@ -133,6 +133,22 @@ export default function EditFile() {
     document.addEventListener("paste", handlePaste);
   }, []);
 
+  const [isBlocking, setIsBlocking] = useState(false);
+  useBlocker(() => isBlocking);
+  useEffect(() => {
+    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+      if (isBlocking) {
+        event.preventDefault();
+        // event.returnValue = "LEAVE_CONFIRMATION";
+      }
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [isBlocking]);
+
   const handleSubmit = (files: FileList | null) => {
     // [x]: Update element (should modify element || order)
     invariant(files, "No file selected");
@@ -151,6 +167,7 @@ export default function EditFile() {
     }
 
     // Seed the file
+    setIsBlocking(true);
     const selectedFile = files[0];
     clientRef.current.seed(selectedFile, async (torrent: any) => {
       console.log("Client is seeding:", torrent.magnetURI);
@@ -258,6 +275,7 @@ export default function EditFile() {
           title="Upload file"
           onChange={(e) => {
             const selectedFile = e.target.files ? e.target.files[0] : null;
+            if (!selectedFile) return; // Do not flush
             setFile(selectedFile);
             handleSubmit(e.target.files);
           }}
