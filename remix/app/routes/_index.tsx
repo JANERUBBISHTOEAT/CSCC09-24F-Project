@@ -35,6 +35,7 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
   const formData = await request.formData();
   const formObj = Object.fromEntries(formData);
   console.log("formObj:", formObj);
+  invariant(formObj.intent, "No intent found");
 
   // * Is OAuth callback
   if (formObj.intent === "OAuthCallback") {

@@ -525,6 +525,7 @@ i {
 }
 .visitor-badge {
   transform: scale(0.8);
+  display: none;
 }
 .github-link {
   /* small image */
