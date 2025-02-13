@@ -105,6 +105,10 @@ export default function EditFile() {
   }
 
   async function handlePaste(event: ClipboardEvent) {
+    // TODO:
+    // [ ]: Remove handler on leave edit page
+    // OR
+    // [ ]: Listen file paste all the time
     const items = event.clipboardData?.items;
     if (!items) {
       return;
