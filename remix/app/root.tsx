@@ -155,8 +155,8 @@ export default function App() {
                         }
                         title={
                           file.owner
-                            ? "You created this file"
-                            : "You downloaded this file"
+                            ? "💡You created this file"
+                            : "💡You downloaded this file"
                         }
                       ></i>
                     </NavLink>

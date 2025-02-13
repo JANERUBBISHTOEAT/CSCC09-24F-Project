@@ -114,7 +114,7 @@ export default function EditFile() {
     if (!clientRef.current || !files) {
       Swal.fire({
         icon: "error",
-        title: "Client not ready",
+        title: "Torrent client not ready",
         text: "Please try again later",
         showConfirmButton: false,
         timer: 2500,
@@ -202,6 +202,7 @@ export default function EditFile() {
     >
       <div
         id="dropzone"
+        title="💡Stay on page to keep seeding"
         // htmlFor="fileInput"
         onDrop={(event) => {
           event.preventDefault();
