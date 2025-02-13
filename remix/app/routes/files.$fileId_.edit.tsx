@@ -186,7 +186,7 @@ export default function EditFile() {
     }
 
     // Seed the file
-    setIsBlocking(true);
+    // setIsBlocking(true);
     const selectedFile = files[0];
     clientRef.current.seed(selectedFile, async (torrent: any) => {
       console.log("Client is seeding:", torrent.magnetURI);
