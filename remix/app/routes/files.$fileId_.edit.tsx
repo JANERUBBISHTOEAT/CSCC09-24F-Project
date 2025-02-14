@@ -113,10 +113,7 @@ export default function EditFile() {
 
   // Handle local paste event
   async function handlePaste(event: ClipboardEvent) {
-    // TODO:
     // [x]: Remove handler on leave edit page
-    // OR
-    // [-]: Listen file paste all the time
     const items = event.clipboardData?.items;
     if (!items) {
       return;

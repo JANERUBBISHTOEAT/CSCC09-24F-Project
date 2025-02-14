@@ -369,6 +369,10 @@ export default function Index() {
     torrent.on("done", async () => {
       console.log("Download finished.");
       progress_div.innerHTML = `Progress: ${(100).toFixed(2)}%`;
+      token_elem.value = "";
+      magnet_elem.value = "";
+      token_elem.className = "";
+      magnet_elem.className = "";
 
       Swal.fire({
         icon: "success",
@@ -383,12 +387,6 @@ export default function Index() {
         console.log("File:", file);
         downloadTorrentFile(file);
       }
-
-      // Clear input
-      token_elem.value = "";
-      magnet_elem.value = "";
-      token_elem.className = "";
-      magnet_elem.className = "";
     });
 
     debounceTimeout.current = setTimeout(() => {
