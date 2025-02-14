@@ -19,6 +19,13 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   if (!file) {
     return redirect("/?message=Page+Not+Found");
   }
+  const url = new URL(request.url);
+  const searchParams = url.searchParams;
+  params = {
+    pasted: searchParams.get("pasted") || undefined,
+    fileName: searchParams.get("fileName") || undefined,
+    mimeType: searchParams.get("mimeType") || undefined,
+  };
   return json({ file: file, params: params });
 };
 
@@ -138,10 +145,15 @@ export default function EditFile() {
   useEffect(() => {
     loadModule();
     const fileURL = localStorage.getItem("fileURL");
+    localStorage.removeItem("fileURL");
     if (params.pasted && fileURL) {
+      console.log("Local handler receive fileURL:", fileURL);
       urlToFile(fileURL, params).then((file) => {
+        console.log("Local handler reconstructed file:", file);
         setFile(file);
-        handleSubmit(new DataTransfer().files);
+        const dataTransfer = new DataTransfer();
+        dataTransfer.items.add(file);
+        handleSubmit(dataTransfer.files);
       });
     }
     document.addEventListener("paste", handlePaste);

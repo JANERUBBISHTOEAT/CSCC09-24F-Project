@@ -146,7 +146,7 @@ export default function Index() {
       // file (go to new file page)
       if (items[i].kind === "file") {
         const file = items[i].getAsFile();
-        console.log("Global file paste event:`", file);
+        console.log("Global file paste event:", file);
         if (!file) continue;
 
         const fileURL = URL.createObjectURL(file);
