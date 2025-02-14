@@ -445,7 +445,7 @@ export default function Index() {
         <input
           type="text"
           name="token"
-          title="Token"
+          title="💡Try pasting onto page without clicking"
           onChange={(e) => {
             debounce(e.target.value, "token");
           }}
@@ -458,7 +458,7 @@ export default function Index() {
         <input
           type="text"
           name="magnet"
-          title="Magnet link"
+          title="💡Same thing for magnets or even files :)"
           onChange={(e) => {
             debounce(e.target.value, "magnet");
           }}

@@ -255,7 +255,7 @@ export default function EditFile() {
       setToken(receivedToken);
 
       // Copy token to clipboard
-      navigator.clipboard.writeText(torrent.magnetURI).then(
+      navigator.clipboard.writeText(receivedToken).then(
         () => {
           console.log("Token copied to clipboard");
           toastr.success("Token copied to clipboard");
