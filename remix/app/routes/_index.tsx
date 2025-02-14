@@ -118,9 +118,6 @@ export default function Index() {
 
   // Handle global paste event
   async function handlePaste(event: ClipboardEvent) {
-    // TODO:
-    // [-]: Remove handler on leave edit page
-    // OR
     // [x]: Listen file paste all the time
     const items = event.clipboardData?.items;
     if (!items) {
@@ -138,6 +135,8 @@ export default function Index() {
           else return;
           (document.getElementsByName(_type)[0] as HTMLInputElement).value =
             text;
+          // Add redirect to `_index` here if `global_paste_listener`
+          // is enable on all pages in the future
           handleDownload(text, _type);
         });
         return;
@@ -165,6 +164,12 @@ export default function Index() {
 
   useEffect(() => {
     document.addEventListener("paste", handlePaste);
+    // ? Remove global on exit _index or not
+    // [ ] Remove event listener lessen pages where paste works
+    // [ ] Keep event listener makes too many reacts
+    return () => {
+      document.removeEventListener("paste", handlePaste);
+    };
   }, []);
 
   useEffect(() => {
