@@ -19,7 +19,7 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   if (!file) {
     return redirect("/?message=Page+Not+Found");
   }
-  return json({ file: file });
+  return json({ file: file, params: params });
 };
 
 export const action = async ({ params, request }: ActionFunctionArgs) => {
@@ -84,7 +84,7 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
 };
 
 export default function EditFile() {
-  const { file: dbFileJson } = useLoaderData<typeof loader>();
+  const { file: dbFileJson, params: params } = useLoaderData<typeof loader>();
   const navigate = useNavigate();
 
   const [file, setFile] = useState<File | null>(null); // [x] Used for react state
@@ -104,11 +104,12 @@ export default function EditFile() {
     }
   }
 
+  // Handle local paste event
   async function handlePaste(event: ClipboardEvent) {
     // TODO:
-    // [ ]: Remove handler on leave edit page
+    // [x]: Remove handler on leave edit page
     // OR
-    // [ ]: Listen file paste all the time
+    // [-]: Listen file paste all the time
     const items = event.clipboardData?.items;
     if (!items) {
       return;
@@ -117,7 +118,7 @@ export default function EditFile() {
     for (let i = 0; i < items.length; i++) {
       if (items[i].kind === "file") {
         const file = items[i].getAsFile();
-        console.log("Global file paste event:", file);
+        console.log("Local file paste event:", file);
         if (file) {
           setFile(file);
           const dataTransfer = new DataTransfer();
@@ -128,12 +129,27 @@ export default function EditFile() {
     }
   }
 
+  async function urlToFile(fileURL: string, params: any) {
+    const response = await fetch(fileURL);
+    const blob = await response.blob();
+    return new File([blob], params.fileName, { type: params.mimeType });
+  }
+
   useEffect(() => {
     loadModule();
+    const fileURL = localStorage.getItem("fileURL");
+    if (params.pasted && fileURL) {
+      urlToFile(fileURL, params).then((file) => {
+        setFile(file);
+        handleSubmit(new DataTransfer().files);
+      });
+    }
     document.addEventListener("paste", handlePaste);
+    return () => {
+      document.removeEventListener("paste", handlePaste);
+    };
   }, []);
 
-  // const [isBlocking, setIsBlocking] = useState(false);
   // const blocker = useBlocker(() => isBlocking);
   // useEffect(() => {
   //   if (blocker.state === "blocked") {
@@ -155,6 +171,7 @@ export default function EditFile() {
   //   }
   // }, [blocker]);
 
+  // const [isBlocking, setIsBlocking] = useState(false);
   // useEffect(() => {
   //   const handleBeforeUnload = (event: BeforeUnloadEvent) => {
   //     if (isBlocking) {

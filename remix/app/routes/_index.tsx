@@ -116,6 +116,57 @@ export default function Index() {
     }
   }
 
+  // Handle global paste event
+  async function handlePaste(event: ClipboardEvent) {
+    // TODO:
+    // [-]: Remove handler on leave edit page
+    // OR
+    // [x]: Listen file paste all the time
+    const items = event.clipboardData?.items;
+    if (!items) {
+      return;
+    }
+
+    for (let i = 0; i < items.length; i++) {
+      // string (token or magnet)
+      if (items[i].kind === "string") {
+        console.log("Global string paste event:", items[i]);
+        items[i].getAsString((text) => {
+          let _type = "";
+          if (/^\d+$/.test(text)) _type = "token";
+          else if (text.startsWith("magnet:?")) _type = "magnet";
+          else return;
+          (document.getElementsByName(_type)[0] as HTMLInputElement).value =
+            text;
+          handleDownload(text, _type);
+        });
+        return;
+      }
+
+      // file (go to new file page)
+      if (items[i].kind === "file") {
+        const file = items[i].getAsFile();
+        console.log("Global file paste event:`", file);
+        if (!file) continue;
+
+        const fileURL = URL.createObjectURL(file);
+        localStorage.setItem("fileURL", fileURL);
+        const formData = new FormData();
+        formData.append("fileName", file.name);
+        formData.append("mimeType", file.type);
+        fetcher.submit(formData, {
+          method: "POST",
+          action: "/api/new/file",
+        });
+      }
+      return;
+    }
+  }
+
+  useEffect(() => {
+    document.addEventListener("paste", handlePaste);
+  }, []);
+
   useEffect(() => {
     loadModule();
   }, []);
