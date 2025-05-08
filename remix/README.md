@@ -26,7 +26,8 @@ Remote: run docker-compose
 
 ```sh
 docker-compose down
-docker-compose up -d --pull always
+docker-compose pull
+docker-compose up -d
 ```
 
 Clean up:
