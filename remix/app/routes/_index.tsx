@@ -491,7 +491,7 @@ export default function Index() {
         </div>
         <GoogleOAuthProvider clientId={client_id}>
           <div className={loggedIn ? "hidden" : "login-button"}>
-            <p>or log in to sync file history:</p>
+            <p>log in to sync file history:</p>
             <GoogleLogin
               onSuccess={(credentialResponse) => {
                 console.log(credentialResponse);
@@ -522,9 +522,15 @@ export default function Index() {
         </a>
         <a
           className="github-link"
+          href="https://github.com/JANERUBBISHTOEAT/CSCC09-24F-Project?tab=readme-ov-file#why-w2w"
+        >
+          | Why W2W?
+        </a>
+        <a
+          className="github-link"
           href="https://github.com/JANERUBBISHTOEAT/CSCC09-24F-Project"
         >
-          View on GitHub
+          | View on GitHub
         </a>
       </div>
     </div>

@@ -24,7 +24,7 @@ Case:
 - **Speed**: Some cloud storage services set limits on **file size** and **transfer speed**.
 - **Still Speed**: File first upload to the server, then download from the server. Take twice the time. P2P **utilizes the whole bandwidth** and doesn't have a file size limit.
 
-**OK, why don't I use a radom online file transfer website?**
+**OK, why don't I use a random online file transfer website?**
 
 - **Security**: I don't want to upload my file to a **random third-party server**. P2P network **does not store files**. You will also see number of peers during the transfer process, to ensure that your file is been transferred **only to the intended recipient**.
 - **Speed**: Most free online file transfer websites have a file **size limit** (e.g., 2GB), and a **transfer speed limit** (e.g., 1MB/s), because traditional storage services pay for both the storage and the bandwidth. P2P server **don't store or transfer files**, so no such limits.
