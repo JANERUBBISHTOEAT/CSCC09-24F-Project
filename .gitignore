@@ -141,3 +141,4 @@ acme/
 certs/
 
 .env*
+.DS_Store
