@@ -18,7 +18,13 @@ This starts your app in development mode, rebuilding assets on file changes.
 Local: build docker image the push to docker hub
 
 ```sh
+# amd64
 docker build -t zheyuanwei/w2w .
+docker push zheyuanwei/w2w
+
+# arm64 to amd64
+docker buildx build --platform=linux/amd64 -t zheyuanwei/w2w:latest --push .
+
 # docker run --rm -p 3000:3000 --network="host" --pull=always zheyuanwei/w2w
 ```
 
